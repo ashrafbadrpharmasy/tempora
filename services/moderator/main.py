@@ -1,7 +1,7 @@
 import os, re, subprocess, tempfile
 from pathlib import Path
 from typing import Any
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, Header, HTTPException, UploadFile
 from pydantic import BaseModel
 
 app = FastAPI(title="Tempora Video Safety Scanner", version="0.1.0")
@@ -78,7 +78,12 @@ def health():
     return {"status":"ok","service":"tempora-moderator"}
 
 @app.post("/scan",response_model=ScanResponse)
-async def scan_video(file: UploadFile = File(...)):
+async def scan_video(file: UploadFile = File(...), x_api_key: str | None = Header(default=None)):
+    expected_key = os.getenv("MODERATOR_API_KEY")
+    if not expected_key:
+        raise HTTPException(503, "Scanner is not configured with an API key.")
+    if not x_api_key or x_api_key != expected_key:
+        raise HTTPException(401, "Unauthorized.")
     suffix = Path(file.filename or "").suffix.lower()
     if suffix not in {".mp4",".mov",".m4v",".webm",".mkv",".avi"}:
         raise HTTPException(400,"Upload a supported video file.")

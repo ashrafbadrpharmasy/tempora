@@ -255,11 +255,12 @@ async function runTool(){
   let PDFDocument,degrees;
   if(['merge-pdf','split-pdf','rotate-pdf','jpg-to-pdf','compress-pdf','edit-pdf'].includes(tool))({PDFDocument,degrees}=await getPdfLib());
   if(tool==='qr-generator'){
-   await loadScript('https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js');
-   const value=$('qrText').value.trim();if(!value)throw Error('Enter a link or text first.');
-   const canvas=document.createElement('canvas');canvas.style.cssText='display:block;width:min(280px,100%);height:auto;margin:12px auto;background:white;border-radius:10px;padding:12px';
-   await window.QRCode.toCanvas(canvas,value,{width:600,margin:2,color:{dark:$('qrColor').value,light:$('qrBg').value},errorCorrectionLevel:'M'});out.append(canvas);
-   const dl=document.createElement('button');dl.className='primary';dl.textContent=window.currentLanguage==='ar'?'تنزيل QR بصيغة PNG':'Download QR as PNG';dl.onclick=()=>canvas.toBlob(b=>saveBlob(b,'tempora-qr.png'),'image/png');out.append(dl);
+   const value=$('qrText').value.trim();if(!value)throw Error(window.currentLanguage==='ar'?'اكتب رابطًا أو نصًا أولًا.':'Enter a link or text first.');
+   const hex=v=>v.replace('#','').toUpperCase(),color=hex($('qrColor').value),bg=hex($('qrBg').value);
+   const src='https://api.qrserver.com/v1/create-qr-code/?size=600x600&margin=18&color='+encodeURIComponent(color)+'&bgcolor='+encodeURIComponent(bg)+'&data='+encodeURIComponent(value);
+   const img=document.createElement('img');img.alt='Generated QR code';img.src=src;img.style.cssText='display:block;width:min(300px,100%);height:auto;margin:12px auto;background:white;border-radius:10px;padding:8px';out.append(img);
+   await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=()=>reject(Error(window.currentLanguage==='ar'?'تعذر إنشاء QR. تأكد من اتصال الإنترنت وحاول مرة أخرى.':'Could not generate the QR code. Check your internet connection and try again.'))});
+   const dl=document.createElement('button');dl.className='primary';dl.textContent=window.currentLanguage==='ar'?'تنزيل QR بصيغة PNG':'Download QR as PNG';dl.onclick=async()=>{try{const response=await fetch(src);if(!response.ok)throw Error();saveBlob(await response.blob(),'tempora-qr.png')}catch(e){const a=document.createElement('a');a.href=src;a.target='_blank';a.rel='noopener';a.click()}};out.append(dl);
   }else if(tool==='percentage'){out.textContent=window.currentLanguage==='ar'?'استخدم الحقول أعلاه؛ النتيجة تتحدث تلقائيًا.':'Use the fields above; the result updates automatically.';
   }else if(tool==='image-text'){
    btn.textContent='Extracting text…';await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js');

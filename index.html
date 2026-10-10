@@ -58,8 +58,9 @@
 </div>
 <div id="videoSection" hidden>
 <section class="panel">
- <div class="inbox-head"><h2>All Video Downloader</h2><span class="timer">PUBLIC LINKS</span></div>
- <p class="hint" style="margin:0 0 14px">Paste a direct media-file link or a supported service link. Direct files can be opened here. For YouTube and streaming platforms, Tempora shows the official service link when it cannot provide a permitted direct download.</p>
+ <div class="inbox-head"><h2>Video Downloader</h2><span class="timer">SAFETY FIRST</span></div>
+ <div role="status" style="border:1px solid #f0c36d;background:#fff8e6;color:#7a4b00;border-radius:10px;padding:13px;margin:0 0 14px"><strong>Video safety screening is not active yet.</strong><div style="font-size:13px;margin-top:5px">Tempora must connect to a real video-analysis service before it can approve downloads. A link or title alone cannot confirm who appears in a video or whether all content is safe. Until the scanner is deployed, direct-file downloads are paused rather than falsely marked safe.</div></div>
+ <p class="hint" style="margin:0 0 14px">Paste a public video link to identify the service. YouTube and streaming links will show official options; direct-file downloads remain blocked until a real safety scanner is connected.</p>
  <label for="videoUrl" class="small">Video or post URL</label>
  <input id="videoUrl" type="url" placeholder="https://..." autocomplete="url" style="display:block;width:100%;margin:6px 0 12px;padding:12px;border:1px solid var(--line);border-radius:9px;background:white;color:var(--text)">
  <button id="videoDownloadBtn" class="primary" type="button">Find downloadable media</button>
@@ -178,6 +179,7 @@ async function downloadVideo(){
   if(!res.ok)throw Error(data.error||'Could not process this link.');
   const note=document.createElement('p');note.className='hint';note.textContent=data.message||'Link checked.';out.append(note);
   if(data.type==='direct-file'){
+   throw Error('Download paused: Tempora’s video safety scanner has not been connected yet. We cannot honestly verify the video’s contents from its URL alone.');
    const row=document.createElement('div');row.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line);flex-wrap:wrap';
    const label=document.createElement('div');label.textContent='Direct media file'+(data.fileName?' · '+data.fileName:'');
    const a=document.createElement('a');a.href=data.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Open / download file';a.style.cssText='color:var(--accent);font-weight:700';

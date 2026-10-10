@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: tempora-video-moderator
+    runtime: docker
+    plan: free
+    rootDir: services/moderator
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: MODERATOR_API_KEY
+        sync: false
+      - key: MAX_VIDEO_BYTES
+        value: "52428800"
+      - key: MAX_VIDEO_SECONDS
+        value: "300"
+      - key: SCAN_FRAMES_PER_SECOND
+        value: "1"

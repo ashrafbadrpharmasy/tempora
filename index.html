@@ -13,7 +13,7 @@
 <header><div class="brand">tempora<span>.</span></div><span class="small">Free temporary email</span></header>
 <main class="wrap">
 <section class="intro"><h1>A simple inbox for temporary email.</h1><p>Get an address, receive a message, and copy your verification code.</p></section>
-<div class="tabs" role="tablist" aria-label="Inbox type"><button class="tab active" id="emailTab" role="tab" aria-selected="true">Email</button><button class="tab" id="smsTab" role="tab" aria-selected="false">Temporary SMS</button></div>
+<div class="tabs" role="tablist" aria-label="Inbox type"><button class="tab active" id="emailTab" role="tab" aria-selected="true">Email</button><button class="tab" id="smsTab" role="tab" aria-selected="false">Virtual Cards (Demo)</button></div>
 <div id="emailSection">
 <section class="panel"><div class="status"><i id="dot" class="dot"></i><span id="status">Ready when you are</span></div><h2>Your email address</h2>
 <div class="address"><input id="email" placeholder="Click Generate inbox to begin" readonly aria-label="Temporary email address"><button id="copyBtn" disabled>Copy</button></div>
@@ -25,12 +25,31 @@
 </section>
 <section class="panel"><div class="inbox-head"><h2>Inbox</h2><span id="lastUpdated" class="small">No inbox yet</span></div><div id="messages"><div class="empty"><strong>Your inbox is empty</strong>Your received emails will show up here.</div></div></section>
 </div>
-<div id="smsSection" hidden><section class="panel"><div class="inbox-head"><h2>Temporary phone number</h2><span class="timer" id="smsTimer">10:00</span></div>
-<div class="sms-note" style="margin:14px 0">SMS is not connected yet. This section needs a real provider before it can issue a phone number or receive messages.</div>
-<div class="address"><input id="phoneNumber" placeholder="A number will appear here when connected" readonly aria-label="Temporary phone number"><button disabled>Copy</button></div>
-<div class="actions"><button class="primary" disabled>Get number</button><button disabled>↻ Refresh SMS</button></div>
-<h2 style="margin-top:22px">Received SMS</h2><div class="empty"><strong>No messages</strong>Messages will appear here after an SMS provider is connected.</div>
-<p class="hint">The 10-minute timer is a visual preview only. No number is currently reserved and no SMS can be received yet.</p></section></div>
+<div id="smsSection" hidden>
+<section class="panel">
+ <div class="inbox-head"><h2>Virtual card sandbox</h2><span class="timer">DEMO ONLY</span></div>
+ <p class="hint" style="margin:0 0 16px">Preview the card workflow for Tempora. These are simulated details, not real Visa or Mastercard cards, and cannot be used to pay, start trials, or pass payment verification.</p>
+ <label for="cardNetwork" class="small">Card network</label>
+ <select id="cardNetwork" style="display:block;width:100%;margin:6px 0 14px;padding:12px;border:1px solid var(--line);border-radius:9px;background:white;color:var(--text)">
+  <option value="Visa">Visa (demo)</option><option value="Mastercard">Mastercard (demo)</option>
+ </select>
+ <label for="cardCountry" class="small">Country</label>
+ <select id="cardCountry" style="display:block;width:100%;margin:6px 0 14px;padding:12px;border:1px solid var(--line);border-radius:9px;background:white;color:var(--text)">
+  <option value="Egypt">Egypt</option><option value="United States">United States</option><option value="United Kingdom">United Kingdom</option><option value="Brazil">Brazil</option>
+ </select>
+ <button id="generateCardBtn" class="primary" type="button">Generate demo card</button>
+ <div id="demoCardResult" hidden style="margin-top:18px;border:1px solid var(--line);border-radius:14px;padding:18px;background:linear-gradient(135deg,#f7f8ff,#eef2ff)">
+  <div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><strong id="demoCardNetwork">VISA</strong><span class="small">TEMPORA · DEMO</span></div>
+  <div style="font-size:21px;font-weight:800;letter-spacing:2px;margin:24px 0 12px">•••• •••• •••• <span id="demoCardLast4">0000</span></div>
+  <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><div class="small">COUNTRY</div><strong id="demoCardCountry">Egypt</strong></div><div><div class="small">STATUS</div><strong>Not a real payment card</strong></div></div>
+  <p class="hint">No real card number, CVV, or payment credentials are generated.</p>
+ </div>
+</section>
+<section class="panel">
+ <h2>How real cards work</h2>
+ <p class="hint" style="margin:0">Real virtual Visa/Mastercard issuance requires an approved financial provider, identity/business checks, and usually funding or fees. This demo does not connect to a card issuer.</p>
+</section>
+</div>
 <div class="foot">Email service by <a href="https://mailboxtemp.com/docs/" target="_blank" rel="noopener">MailboxTemp</a>. Inboxes expire after a limited time; use them for low-risk testing only.</div>
 </main>
 <div id="modal"><div class="dialog"><div class="dialogtop"><h2 id="modalTitle">Email</h2><button id="closeModal">Close</button></div><div id="modalBody"></div></div></div><div id="toast" class="toast"></div>
@@ -58,7 +77,7 @@ function members(d){return d['hydra:member']||d.member||d.domains||[]}
 function randomName(){const bytes=new Uint8Array(9);crypto.getRandomValues(bytes);return Array.from(bytes,b=>b.toString(36).padStart(2,'0')).join('').slice(0,13)+Date.now().toString(36).slice(-4)}
 async function generate(){
  if(busy)return;busy=true;$('createBtn').disabled=true;$('createBtn').textContent='Creating…';$('error').hidden=true;
- if(timer){clearInterval(timer);timer=null}token=null;account=null;active(false);$('email').value='';$('messages').innerHTML='<div class="empty">Creating your inbox…</div>';status('Connecting');
+ if(timer){clearInterval(timer);timer=null}stopEmailTimer();token=null;account=null;active(false);$('email').value='';$('messages').innerHTML='<div class="empty">Creating your inbox…</div>';status('Connecting');
  try{
   const created=await req('/inbox/generate',{method:'POST'});
   if(!created.ok||!created.address)throw Error(created.error||'The email provider did not return an inbox address.');
@@ -111,5 +130,14 @@ async function openMessage(id){
 }
 async function copy(s){try{await navigator.clipboard.writeText(s);toast('Copied')}catch(e){const el=document.createElement('textarea');el.value=s;document.body.append(el);el.select();document.execCommand('copy');el.remove();toast('Copied')}}
 function reset(){if(timer)clearInterval(timer);timer=null;stopEmailTimer();token=null;account=null;active(false);$('email').value='';$('lastUpdated').textContent='No inbox yet';$('error').hidden=true;$('messages').innerHTML='<div class="empty"><strong>Your inbox is empty</strong>Your received emails will show up here.</div>';status('Ready when you are');toast('Ready for a new inbox')}
+function generateDemoCard(){
+ const network=$('cardNetwork').value,country=$('cardCountry').value;
+ const bytes=new Uint8Array(2);crypto.getRandomValues(bytes);
+ $('demoCardNetwork').textContent=network.toUpperCase();
+ $('demoCardCountry').textContent=country;
+ $('demoCardLast4').textContent=String(1000+((bytes[0]*256+bytes[1])%9000));
+ $('demoCardResult').hidden=false;
+}
+$('generateCardBtn').onclick=generateDemoCard;
 $('emailTab').onclick=()=>{ $('emailSection').hidden=false;$('smsSection').hidden=true;$('emailTab').classList.add('active');$('smsTab').classList.remove('active');$('emailTab').setAttribute('aria-selected','true');$('smsTab').setAttribute('aria-selected','false') };$('smsTab').onclick=()=>{ $('emailSection').hidden=true;$('smsSection').hidden=false;$('smsTab').classList.add('active');$('emailTab').classList.remove('active');$('smsTab').setAttribute('aria-selected','true');$('emailTab').setAttribute('aria-selected','false') };$('createBtn').onclick=generate;$('refreshBtn').onclick=refresh;$('extendTimerBtn').onclick=extendEmailTimer;$('copyBtn').onclick=()=>copy($('email').value);$('deleteBtn').onclick=reset;$('closeModal').onclick=()=>$('modal').classList.remove('open');$('modal').onclick=e=>{if(e.target===$('modal'))$('modal').classList.remove('open')};
 </script></body></html>

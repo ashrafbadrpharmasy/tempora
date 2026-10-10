@@ -5,12 +5,12 @@ const ADULT_DOMAINS = [
  'livejasmin.com','youjizz.com','hclips.com','sex.com','nhentai.net'
 ];
 const ADULT_TERMS = ['porn','xxx','hentai','nsfw','adult-video'];
-const DIRECT_EXTENSIONS = /\\.(mp4|webm|mov|m4v|mp3|m4a|aac|ogg|wav|flac|jpg|jpeg|png|gif|webp|pdf)(?:$|[?#])/i;
+const DIRECT_EXTENSIONS = /\.(mp4|webm|mov|m4v|mp3|m4a|aac|ogg|wav|flac|jpg|jpeg|png|gif|webp|pdf)(?:$|[?#])/i;
 function hostMatches(host, domain) { return host === domain || host.endsWith('.' + domain); }
 function privateHost(host) {
-  const h = host.toLowerCase().replace(/^\\[|\\]$/g, '');
+  const h = host.toLowerCase().replace(/^\[|\]$/g, '');
   if (h === 'localhost' || h.endsWith('.localhost') || h.endsWith('.local') || h === '::1') return true;
-  if (/^(\\d{1,3}\\.){3}\\d{1,3}$/.test(h)) {
+  if (/^(\d{1,3}\.){3}\d{1,3}$/.test(h)) {
     const p = h.split('.').map(Number);
     if (p.some(n => n > 255)) return true;
     return p[0] === 10 || p[0] === 127 || p[0] === 0 || (p[0] === 169 && p[1] === 254) || (p[0] === 172 && p[1] >= 16 && p[1] <= 31) || (p[0] === 192 && p[1] === 168) || p[0] >= 224;
@@ -26,9 +26,9 @@ module.exports = async (req, res) => {
   let url;
   try { url = new URL(raw); } catch { return res.status(400).json({ error: 'That URL is not valid.' }); }
   if ((url.protocol !== 'https:' && url.protocol !== 'http:') || url.username || url.password || !url.hostname.includes('.') || privateHost(url.hostname)) return res.status(400).json({ error: 'Only normal public HTTP(S) URLs are allowed.' });
-  const host = url.hostname.toLowerCase().replace(/^www\\./, '');
+  const host = url.hostname.toLowerCase().replace(/^www\./, '');
   const pathAndQuery = (url.pathname + url.search).toLowerCase();
-  const configured = (process.env.BLOCKED_DOMAINS || '').split(',').map(s => s.trim().toLowerCase().replace(/^www\\./, '')).filter(Boolean);
+  const configured = (process.env.BLOCKED_DOMAINS || '').split(',').map(s => s.trim().toLowerCase().replace(/^www\./, '')).filter(Boolean);
   if (ADULT_DOMAINS.some(d => hostMatches(host, d)) || configured.some(d => hostMatches(host, d)) || ['.xxx','.porn','.sex'].some(t => host.endsWith(t)) || ADULT_TERMS.some(t => host.includes(t) || pathAndQuery.includes(t))) return res.status(403).json({ error: 'Blocked by Tempora safety rules.' });
   if (hostMatches(host, 'spotify.com') || hostMatches(host, 'anghami.com')) return res.status(200).json({ type: 'official-service', url: url.href, message: 'This is a music-streaming link. Tempora will not extract or bypass streaming protections; use the service’s official offline-download feature where available.' });
   if (DIRECT_EXTENSIONS.test(url.pathname + url.search)) {

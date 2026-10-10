@@ -228,27 +228,5 @@ async function runTool(){
 $('emailTab').onclick=()=>showTool('email');$('toolsTab').onclick=()=>showTool('tools');
 $('toolSelect').onchange=renderToolOptions;$('runToolBtn').onclick=runTool;renderToolOptions();
 
-async function downloadVideo(){
- const url=$('videoUrl').value.trim(),btn=$('videoDownloadBtn'),err=$('videoError'),out=$('videoResults');
- err.hidden=true;out.innerHTML='';
- if(!url){err.textContent='Paste a URL first.';err.hidden=false;return}
- btn.disabled=true;btn.textContent='Checking link…';
- try{
-  const res=await fetch('/api/download',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})});
-  const data=await res.json().catch(()=>({}));
-  if(!res.ok)throw Error(data.error||'Could not process this link.');
-  const note=document.createElement('p');note.className='hint';note.textContent=data.message||'Link checked.';out.append(note);
-  if(data.type==='direct-file'){
-   throw Error('Download paused: Tempora’s video safety scanner has not been connected yet. We cannot honestly verify the video’s contents from its URL alone.');
-   const row=document.createElement('div');row.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line);flex-wrap:wrap';
-   const label=document.createElement('div');label.textContent='Direct media file'+(data.fileName?' · '+data.fileName:'');
-   const a=document.createElement('a');a.href=data.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Open / download file';a.style.cssText='color:var(--accent);font-weight:700';
-   row.append(label,a);out.append(row);
-  } else if(data.type==='official-service'){
-   const a=document.createElement('a');a.href=data.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Open '+(data.service||'official service');a.style.cssText='color:var(--accent);font-weight:700';out.append(a);
-  } else if(data.type==='unsupported'){throw Error(data.message||'This link cannot be downloaded directly by the free version.')}
- }catch(e){err.textContent=e.message||'Could not process this link.';err.hidden=false}
- finally{btn.disabled=false;btn.textContent='Check link'}
-}
 $('createBtn').onclick=generate;$('refreshBtn').onclick=refresh;$('extendTimerBtn').onclick=extendEmailTimer;$('copyBtn').onclick=()=>copy($('email').value);$('deleteBtn').onclick=reset;$('closeModal').onclick=()=>$('modal').classList.remove('open');$('modal').onclick=e=>{if(e.target===$('modal'))$('modal').classList.remove('open')};
 </script></body></html>

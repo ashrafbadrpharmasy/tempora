@@ -188,7 +188,7 @@ $('toolDescription').textContent=(toolDescriptions[window.currentLanguage]||tool
 };
  $('workspaceTitle').textContent=(titles[window.currentLanguage]||titles.en)[tool]||'File Tool';
  $('fileHint').textContent=window.currentLanguage==='ar'?(['merge-pdf','jpg-to-pdf'].includes(tool)?'يمكنك اختيار أكثر من ملف.':'اختر ملفًا من جهازك.'):(['merge-pdf','jpg-to-pdf'].includes(tool)?'You can select multiple files.':'Select a file from your device.');
- $('toolFiles').disabled=false;$('runToolBtn').disabled=false;$('runToolBtn').textContent='Process files';$('toolError').hidden=true;
+ $('toolFiles').disabled=false;$('runToolBtn').disabled=false;$('runToolBtn').textContent=window.currentLanguage==='ar'?'معالجة الملفات':'Process files';$('toolError').hidden=true;
 
  const field=(label,id,type='number',value='')=>{
   const wrap=document.createElement('label');wrap.className='small';wrap.textContent=label;
@@ -327,7 +327,7 @@ function applyLanguage(lang){
  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{const key=el.dataset.i18nPlaceholder;if(t[key]!==undefined)el.placeholder=t[key]});
  $('languageToggle').textContent=lang==='ar'?'English':'العربية';$('languageToggle').setAttribute('aria-label',lang==='ar'?'Switch to English':'التبديل إلى العربية');
  const actionKeys={'merge-pdf':'chooseFiles','split-pdf':'chooseFile','compress-pdf':'chooseFile','pdf-to-jpg':'chooseFile','jpg-to-pdf':'chooseImages','pdf-to-word':'openTool','word-to-pdf':'openTool','rotate-pdf':'chooseFile','edit-pdf':'openTool','image-convert':'chooseImage','image-resize':'chooseImage','image-compress':'chooseImage','remove-bg':'openTool','ocr-pdf':'openTool'};
- document.querySelectorAll('.tool-card').forEach(card=>{const action=card.querySelector('.tool-card-link');const key=actionKeys[card.dataset.tool];if(action&&key&&action.firstChild&&action.firstChild.nodeType===3)action.firstChild.textContent=t[key]+' '});
+ document.querySelectorAll('.tool-card').forEach(card=>{const action=card.querySelector('.tool-card-link');const key=actionKeys[card.dataset.tool];if(action&&key){const label=action.querySelector('[data-i18n]');if(label)label.textContent=t[key];else if(action.firstChild&&action.firstChild.nodeType===3)action.firstChild.textContent=t[key]+' '}});
  if(window.currentTool&&$('toolWorkspace')&&!$('toolWorkspace').hidden)renderToolOptions();
 }
 $('languageToggle').onclick=()=>applyLanguage(window.currentLanguage==='en'?'ar':'en');

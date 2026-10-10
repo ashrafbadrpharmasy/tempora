@@ -27,11 +27,11 @@
 <div class="actions"><button class="primary" disabled>Get number</button><button disabled>↻ Refresh SMS</button></div>
 <h2 style="margin-top:22px">Received SMS</h2><div class="empty"><strong>No messages</strong>Messages will appear here after an SMS provider is connected.</div>
 <p class="hint">The 10-minute timer is a visual preview only. No number is currently reserved and no SMS can be received yet.</p></section></div>
-<div class="foot">Email service by <a href="https://mail.tm/" target="_blank" rel="noopener">Mail.tm</a>. Use temporary inboxes for low-risk testing only.</div>
+<div class="foot">Email service by <a href="https://mailboxtemp.com/docs/" target="_blank" rel="noopener">MailboxTemp</a>. Inboxes expire after a limited time; use them for low-risk testing only.</div>
 </main>
 <div id="modal"><div class="dialog"><div class="dialogtop"><h2 id="modalTitle">Email</h2><button id="closeModal">Close</button></div><div id="modalBody"></div></div></div><div id="toast" class="toast"></div>
 <script>
-const API='https://api.mail.tm';
+const API='https://mailboxtemp.com/api';
 let token=null,account=null,timer=null,busy=false;
 const $=id=>document.getElementById(id);
 function toast(s){$('toast').textContent=s;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2200)}
@@ -45,7 +45,7 @@ async function req(path,opts={}){
  if(token && !opts.noAuth)headers.Authorization='Bearer '+token;
  let response;
  try{response=await fetch(API+path,{...opts,headers,cache:'no-store'})}
- catch(e){throw Error('Browser could not reach Mail.tm ('+(e?.message||'network error')+'). This may be a network or browser CORS restriction; no inbox was created.')}
+ catch(e){throw Error('Browser could not reach the email provider ('+(e?.message||'network error')+'). This may be a network or browser CORS restriction; no inbox was created.')}
  const raw=await response.text();let data={};try{data=raw?JSON.parse(raw):{}}catch{}
  if(!response.ok){let msg=data['hydra:description']||data.message||data.detail||('Mail provider returned HTTP '+response.status);if(response.status===429)msg='The mail provider is receiving too many requests. Wait a few seconds and try again.';throw Error(msg)}
  return data
@@ -56,43 +56,32 @@ async function generate(){
  if(busy)return;busy=true;$('createBtn').disabled=true;$('createBtn').textContent='Creating…';$('error').hidden=true;
  if(timer){clearInterval(timer);timer=null}token=null;account=null;active(false);$('email').value='';$('messages').innerHTML='<div class="empty">Creating your inbox…</div>';status('Connecting');
  try{
-  const domainData=await req('/domains?page=1',{noAuth:true});
-  const domains=members(domainData).filter(d=>d.domain&&d.isActive!==false);
-  if(!domains.length)throw Error('The provider has no available email domains right now. Try again later.');
-  let lastError;
-  for(let attempt=0;attempt<3;attempt++){
-   const domain=domains[Math.floor(Math.random()*domains.length)].domain;
-   const candidate={address:randomName()+'@'+domain,password:randomName()+'Aa7!z'};
-   try{
-    await req('/accounts',{method:'POST',body:JSON.stringify(candidate),noAuth:true});
-    const auth=await req('/token',{method:'POST',body:JSON.stringify(candidate),noAuth:true});
-    if(!auth.token)throw Error('The provider did not return a login token.');
-    account=candidate;token=auth.token;break;
-   }catch(e){lastError=e;if(!String(e.message).includes('422')&&!/already exists|already used|address.*invalid|username/i.test(e.message))throw e}
-  }
-  if(!token)throw lastError||Error('Could not create an inbox. Please try again.');
+  const created=await req('/inbox/generate',{method:'POST'});
+  if(!created.ok||!created.address)throw Error(created.error||'The email provider did not return an inbox address.');
+  account={address:created.address,expires:created.expires,inboxId:created.inboxId};
   $('email').value=account.address;active(true);status('Inbox ready',true);$('error').hidden=true;toast('Inbox created');
-  await refresh();timer=setInterval(()=>refresh(),15000);
+  await refresh();timer=setInterval(()=>refresh(),10000);
  }catch(e){explainError(e);$('messages').innerHTML='<div class="empty"><strong>Inbox not created</strong>Check the message above, then try again.</div>'}
  finally{busy=false;$('createBtn').disabled=false;$('createBtn').textContent='Generate inbox'}
 }
 async function refresh(){
- if(!token||busy)return;
+ if(!account||busy)return;
  try{
-  const data=await req('/messages?page=1');const list=members(data);$('lastUpdated').textContent='Updated '+new Date().toLocaleTimeString();$('error').hidden=true;status('Inbox active',true);
+  const data=await req('/inbox/'+encodeURIComponent(account.address)+'/emails');
+  const list=data.emails||[];$('lastUpdated').textContent='Updated '+new Date().toLocaleTimeString();$('error').hidden=true;status('Inbox active',true);
   if(!list.length){$('messages').innerHTML='<div class="empty"><strong>Your inbox is empty</strong>Waiting for incoming messages…</div>';return}
   $('messages').innerHTML='';
-  list.forEach(m=>{const b=document.createElement('button');b.className='mail';const title=document.createElement('b');title.textContent=m.subject||'(No subject)';const meta=document.createElement('span');meta.textContent=(m.from?.address||'Unknown sender')+' · '+new Date(m.createdAt).toLocaleString();b.append(title,meta);b.onclick=()=>openMessage(m.id);$('messages').append(b)})
+  list.forEach(m=>{const b=document.createElement('button');b.className='mail';const title=document.createElement('b');title.textContent=m.subject||'(No subject)';const meta=document.createElement('span');meta.textContent=(m.from_address||m.from_name||'Unknown sender')+' · '+new Date(m.received_at||Date.now()).toLocaleString();b.append(title,meta);b.onclick=()=>openMessage(m.id);$('messages').append(b)})
  }catch(e){status('Connection issue');$('error').hidden=false;$('error').textContent=e.message||'Could not refresh inbox.'}
 }
 async function openMessage(id){
  try{
-  const m=await req('/messages/'+encodeURIComponent(id));let body='';
-  if(Array.isArray(m.text))body=m.text.join('\n');else if(typeof m.text==='string')body=m.text;
-  if(!body){const d=document.createElement('div');d.innerHTML=Array.isArray(m.html)?m.html.join(' '):(m.html||'');body=d.textContent||d.innerText||'No text content provided.'}
-  const code=body.match(/\b\d{4,8}\b/);$('modalTitle').textContent=m.subject||'Email message';
-  $('modalBody').innerHTML='<p class="small">From: '+escapeHtml(m.from?.address||'Unknown')+'</p><p class="small">Received: '+escapeHtml(new Date(m.createdAt).toLocaleString())+'</p>'+(code?'<p><b>Possible code: </b><code>'+escapeHtml(code[0])+'</code> <button id="copyCode">Copy code</button></p>':'')+'<hr style="border:0;border-top:1px solid #e4e7ec"><pre>'+escapeHtml(body)+'</pre>';
-  if(code)$('copyCode').onclick=()=>copy(code[0]);$('modal').classList.add('open');
+  const result=await req('/email/'+encodeURIComponent(account.address)+'/'+encodeURIComponent(id));const m=result.email||result;let body=m.body_text||'';
+  if(!body&&m.body_html){const d=document.createElement('div');d.innerHTML=m.body_html;body=d.textContent||d.innerText||'No text content provided.'}
+  if(!body)body='No text content provided.';
+  const found=body.match(/\\b\\d{4,8}\\b/);const code=m.otp_code||found?.[0];$('modalTitle').textContent=m.subject||'Email message';
+  $('modalBody').innerHTML='<p class="small">From: '+escapeHtml(m.from_address||m.from_name||'Unknown')+'</p><p class="small">Received: '+escapeHtml(new Date(m.received_at||Date.now()).toLocaleString())+'</p>'+(code?'<p><b>Possible code: </b><code>'+escapeHtml(code)+'</code> <button id="copyCode">Copy code</button></p>':'')+'<hr style="border:0;border-top:1px solid #e4e7ec"><pre>'+escapeHtml(body)+'</pre>';
+  if(code)$('copyCode').onclick=()=>copy(code);$('modal').classList.add('open');
  }catch(e){toast('Could not open this email: '+(e.message||''))}
 }
 async function copy(s){try{await navigator.clipboard.writeText(s);toast('Copied')}catch(e){const el=document.createElement('textarea');el.value=s;document.body.append(el);el.select();document.execCommand('copy');el.remove();toast('Copied')}}

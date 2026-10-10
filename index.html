@@ -207,7 +207,7 @@ async function getPdfJs(){if(!window.pdfjsLib){await loadScript('https://cdnjs.c
 function saveBlob(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000)}
 async function imageFromFile(file){return new Promise((resolve,reject)=>{const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{URL.revokeObjectURL(url);resolve(img)};img.onerror=()=>{URL.revokeObjectURL(url);reject(Error('Could not read that image.'))};img.src=url})}
 async function runTool(){
- const tool=$('toolSelect').value,files=Array.from($('toolFiles').files),btn=$('runToolBtn'),err=$('toolError'),out=$('toolResult');
+ const tool=window.currentTool||'merge-pdf',files=Array.from($('toolFiles').files),btn=$('runToolBtn'),err=$('toolError'),out=$('toolResult');
  err.hidden=true;out.innerHTML='';
  const coming=['remove-bg','pdf-to-word','word-to-pdf','compress-pdf','edit-pdf','ocr-pdf'];
  if(coming.includes(tool)){err.textContent=toolInfo[tool];err.hidden=false;return}

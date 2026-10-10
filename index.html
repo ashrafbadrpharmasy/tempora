@@ -356,7 +356,7 @@ async function runTool(){
    const bytes=n=>n<1024?(n+' B'):(n<1048576?(n/1024).toFixed(1)+' KB':(n/1048576).toFixed(2)+' MB');
    const msg=window.currentLanguage==='ar'?'الحجم الأصلي: '+bytes(processedInfo.original)+' · الحجم بعد الضغط: '+bytes(processedInfo.compressed)+' · '+(delta>=0?'تم توفير '+delta+'% ('+bytes(saved)+')':'زاد الحجم '+Math.abs(delta)+'%'):'Original: '+bytes(processedInfo.original)+' · Compressed: '+bytes(processedInfo.compressed)+' · '+(delta>=0?'Saved '+delta+'% ('+bytes(saved)+')':'File grew by '+Math.abs(delta)+'%');
    out.innerHTML='<div class="compression-result"></div>';out.firstChild.textContent=msg;
-  }else out.textContent=window.currentLanguage==='ar'?'اكتملت المعالجة. من المفترض أن يبدأ التنزيل تلقائيًا.':'Processing finished. Your download should start automatically.';
+  }else if(tool!=='qr-generator')out.textContent=window.currentLanguage==='ar'?'اكتملت المعالجة. من المفترض أن يبدأ التنزيل تلقائيًا.':'Processing finished. Your download should start automatically.';
  }catch(e){err.textContent=e?.message||'Could not process this file.';err.hidden=false}
  finally{btn.disabled=false;btn.textContent=window.currentLanguage==='ar'?'معالجة الملفات':'Process files'}
 }

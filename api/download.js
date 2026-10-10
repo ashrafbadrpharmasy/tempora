@@ -30,7 +30,8 @@ module.exports = async (req, res) => {
   const pathAndQuery = (url.pathname + url.search).toLowerCase();
   const configured = (process.env.BLOCKED_DOMAINS || '').split(',').map(s => s.trim().toLowerCase().replace(/^www\./, '')).filter(Boolean);
   if (ADULT_DOMAINS.some(d => hostMatches(host, d)) || configured.some(d => hostMatches(host, d)) || ['.xxx','.porn','.sex'].some(t => host.endsWith(t)) || ADULT_TERMS.some(t => host.includes(t) || pathAndQuery.includes(t))) return res.status(403).json({ error: 'Blocked by Tempora safety rules.' });
-  if (hostMatches(host, 'spotify.com') || hostMatches(host, 'anghami.com')) return res.status(200).json({ type: 'official-service', url: url.href, message: 'This is a music-streaming link. Tempora will not extract or bypass streaming protections; use the service’s official offline-download feature where available.' });
+  if (hostMatches(host, 'youtube.com') || hostMatches(host, 'youtu.be') || hostMatches(host, 'youtube-nocookie.com')) return res.status(200).json({ type: 'official-service', url: url.href, service: 'YouTube', message: 'YouTube link recognized. This version does not extract video streams. Use YouTube’s official Download option when it is available for your account and location, or download your own video from YouTube Studio.' });
+  if (hostMatches(host, 'spotify.com') || hostMatches(host, 'anghami.com')) return res.status(200).json({ type: 'official-service', url: url.href, service: hostMatches(host, 'spotify.com') ? 'Spotify' : 'Anghami', message: 'Music service link recognized. Tempora will not extract protected audio. Use the service’s official offline-download feature where available.' });
   if (DIRECT_EXTENSIONS.test(url.pathname + url.search)) {
     let fileName = url.pathname.split('/').pop() || '';
     try { fileName = decodeURIComponent(fileName); } catch {}

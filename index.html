@@ -2,9 +2,9 @@
 <html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="Tempora — a simple temporary email inbox.">
+<meta name="description" content="Tempora — temporary email plus handy PDF and image tools.">
 <meta name="theme-color" content="#ffffff">
-<title>Tempora — Temporary Email</title>
+<title>Tempora — Email & File Tools</title>
 <style>
 :root{color-scheme:light;--bg:#f7f8fa;--card:#fff;--text:#20242c;--muted:#6e7582;--line:#e4e7ec;--accent:#315efb;--soft:#eef2ff;--ok:#16845b;--bad:#b42318}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif}button,input{font:inherit}button{cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--text);border-radius:9px;padding:10px 14px;font-weight:600}button:hover{border-color:#b8c5ff}button:disabled{opacity:.5;cursor:not-allowed}.primary{background:var(--accent);border-color:var(--accent);color:white}.wrap{width:min(760px,calc(100% - 32px));margin:auto}header{height:72px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding:0 max(16px,calc((100% - 760px)/2));background:#fff}.brand{font-size:21px;font-weight:800;letter-spacing:-.7px}.brand span{color:var(--accent)}.small{font-size:12px;color:var(--muted)}main{padding:44px 0 60px}.intro{text-align:center;margin-bottom:28px}.intro h1{font-size:clamp(30px,5vw,42px);line-height:1.1;letter-spacing:-1.4px;margin:0 0 12px}.intro p{color:var(--muted);margin:0}.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:16px}.panel h2{font-size:16px;margin:0 0 14px}.address{display:flex;gap:8px}.address input{min-width:0;flex:1;border:1px solid var(--line);border-radius:9px;padding:12px;background:#fafbfc;color:var(--text)}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.status{display:flex;gap:7px;align-items:center;font-size:12px;color:var(--muted);margin-bottom:14px}.dot{width:7px;height:7px;background:#a0a6b2;border-radius:50%}.dot.good{background:var(--ok)}.hint{color:var(--muted);font-size:12px;margin:13px 0 0}.inbox-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.empty{border:1px dashed var(--line);border-radius:10px;padding:32px 12px;text-align:center;color:var(--muted)}.empty strong{display:block;color:var(--text);margin-bottom:4px}.mail{display:block;width:100%;text-align:left;border-radius:10px;margin-top:8px;padding:12px}.mail b,.mail span{display:block;overflow-wrap:anywhere}.mail span{font-size:12px;color:var(--muted);margin-top:3px}.error{background:#fff3f2;color:var(--bad);padding:12px;border-radius:9px;margin-top:12px;font-size:13px;overflow-wrap:anywhere}.tabs{display:flex;gap:6px;background:#eef0f5;padding:5px;border-radius:10px;margin-bottom:16px}.tab{flex:1;border:0;background:transparent;color:var(--muted);padding:10px}.tab.active{background:#fff;color:var(--text);box-shadow:0 1px 3px #17203312}.timer{font-size:13px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}.timer-panel{display:flex;align-items:center;justify-content:space-between;gap:12px}.timer-big{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:.5px}.timer-sub{font-size:12px;color:var(--muted)}@media(max-width:420px){.timer-panel{align-items:flex-start;flex-direction:column}.timer-panel .actions{width:100%}.timer-panel .actions button{flex:1}}.sms-note{background:#f8f9fc;border:1px solid var(--line);border-radius:10px;padding:14px;color:var(--muted);font-size:13px}.foot{text-align:center;color:var(--muted);font-size:12px;margin-top:24px}.foot a{color:inherit}#modal{position:fixed;inset:0;background:#0007;display:none;place-items:center;padding:16px}#modal.open{display:grid}.dialog{background:#fff;border-radius:14px;padding:20px;width:min(620px,100%);max-height:85vh;overflow:auto}.dialogtop{display:flex;justify-content:space-between;align-items:center;gap:12px}.dialog pre{white-space:pre-wrap;overflow-wrap:anywhere;font:14px/1.6 system-ui}.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#20242c;color:white;border-radius:9px;padding:10px 15px;display:none}.toast.show{display:block}@media(max-width:520px){main{padding-top:30px}.panel{padding:16px}.address{flex-wrap:wrap}.address input{flex-basis:100%}.address button{flex:1}}
@@ -13,7 +13,7 @@
 <header><div class="brand">tempora<span>.</span></div><span class="small">Free temporary email</span></header>
 <main class="wrap">
 <section class="intro"><h1>A simple inbox for temporary email.</h1><p>Get an address, receive a message, and copy your verification code.</p></section>
-<div class="tabs" role="tablist" aria-label="Tempora tools"><button class="tab active" id="emailTab" role="tab" aria-selected="true">Email</button><button class="tab" id="smsTab" role="tab" aria-selected="false">Virtual Cards (Demo)</button><button class="tab" id="videoTab" role="tab" aria-selected="false">Video Downloader</button></div>
+<div class="tabs" role="tablist" aria-label="Tempora tools"><button class="tab active" id="emailTab" role="tab" aria-selected="true">Email</button><button class="tab" id="toolsTab" role="tab" aria-selected="false">Tools</button></div>
 <div id="emailSection">
 <section class="panel"><div class="status"><i id="dot" class="dot"></i><span id="status">Ready when you are</span></div><h2>Your email address</h2>
 <div class="address"><input id="email" placeholder="Click Generate inbox to begin" readonly aria-label="Temporary email address"><button id="copyBtn" disabled>Copy</button></div>
@@ -25,48 +25,34 @@
 </section>
 <section class="panel"><div class="inbox-head"><h2>Inbox</h2><span id="lastUpdated" class="small">No inbox yet</span></div><div id="messages"><div class="empty"><strong>Your inbox is empty</strong>Your received emails will show up here.</div></div></section>
 </div>
-<div id="smsSection" hidden>
+<div id="toolsSection" hidden>
 <section class="panel">
- <div class="inbox-head"><h2>Virtual card sandbox</h2><span class="timer">DEMO ONLY</span></div>
- <p class="hint" style="margin:0 0 16px">Preview the card workflow for Tempora. These are simulated details, not real Visa or Mastercard cards, and cannot be used to pay, start trials, or pass payment verification.</p>
- <label for="cardNetwork" class="small">Card network</label>
- <select id="cardNetwork" style="display:block;width:100%;margin:6px 0 14px;padding:12px;border:1px solid var(--line);border-radius:9px;background:white;color:var(--text)">
-  <option value="Visa">Visa (demo)</option><option value="Mastercard">Mastercard (demo)</option>
+ <div class="inbox-head"><h2>File & Image Tools</h2><span class="timer">TOOLS</span></div>
+ <p class="hint" style="margin:0 0 16px">Quick tools for PDF and image files. Files are processed in your browser for the supported tools below.</p>
+ <label for="toolSelect" class="small">Choose a tool</label>
+ <select id="toolSelect" style="display:block;width:100%;margin:6px 0 14px;padding:12px;border:1px solid var(--line);border-radius:9px;background:white;color:var(--text)">
+  <optgroup label="PDF tools">
+   <option value="merge-pdf">Merge PDF files</option><option value="split-pdf">Split PDF (save each page separately)</option><option value="rotate-pdf">Rotate PDF pages</option><option value="pdf-to-jpg">PDF to JPG</option><option value="jpg-to-pdf">JPG / PNG to PDF</option>
+  </optgroup>
+  <optgroup label="Image tools">
+   <option value="image-convert">Convert image format</option><option value="image-resize">Resize image</option><option value="image-compress">Compress image</option><option value="remove-bg">Remove image background (AI)</option>
+  </optgroup>
+  <optgroup label="More tools (coming soon)">
+   <option value="pdf-to-word">PDF to Word</option><option value="word-to-pdf">Word to PDF</option><option value="compress-pdf">Compress PDF</option><option value="edit-pdf">Edit PDF / add text</option><option value="ocr-pdf">OCR scanned PDF</option>
+  </optgroup>
  </select>
- <label for="cardCountry" class="small">Country</label>
- <select id="cardCountry" style="display:block;width:100%;margin:6px 0 14px;padding:12px;border:1px solid var(--line);border-radius:9px;background:white;color:var(--text)">
-  <option value="Egypt">Egypt</option><option value="United States">United States</option><option value="United Kingdom">United Kingdom</option><option value="Brazil">Brazil</option>
- </select>
- <button id="generateCardBtn" class="primary" type="button">Generate demo card</button>
- <div id="demoCardResult" hidden style="margin-top:18px;border:1px solid var(--line);border-radius:14px;padding:18px;background:linear-gradient(135deg,#f7f8ff,#eef2ff)">
-  <div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><strong id="demoCardNetwork">VISA</strong><span class="small">TEMPORA · DEMO</span></div>
-  <div id="demoCardNumber" style="font-size:21px;font-weight:800;letter-spacing:2px;margin:24px 0 12px;overflow-wrap:anywhere">4242 4242 4242 4242</div>
-  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:12px">
-   <div><div class="small">CARDHOLDER</div><strong id="demoCardHolder">TEMPORA DEMO</strong></div>
-   <div><div class="small">EXPIRES</div><strong id="demoCardExpiry">12/34</strong></div>
-   <div><div class="small">CVV / CVC</div><strong id="demoCardCvv">123</strong></div>
-   <div><div class="small">COUNTRY</div><strong id="demoCardCountry">Egypt</strong></div>
-  </div>
-  <div style="margin-top:12px"><div class="small">STATUS</div><strong>TEST DISPLAY ONLY — NOT A REAL PAYMENT CARD</strong></div>
-  <p class="hint"><strong>TEST DATA ONLY.</strong> These sandbox numbers are for payment-provider test mode only. They are not issued cards and will not work for real purchases, live free trials, or payment verification.</p>
- </div>
+ <div id="toolDescription" class="sms-note" style="margin-bottom:14px">Combine multiple PDF documents into one file.</div>
+ <label for="toolFiles" class="small">Choose file(s)</label>
+ <input id="toolFiles" type="file" multiple accept=".pdf,image/*" style="display:block;width:100%;margin:6px 0 14px;padding:10px;border:1px solid var(--line);border-radius:9px;background:white;color:var(--text)">
+ <div id="toolOptions" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:14px"></div>
+ <button id="runToolBtn" class="primary" type="button">Process files</button>
+ <div id="toolError" class="error" hidden></div>
+ <div id="toolResult" style="margin-top:14px"></div>
+ <p class="hint">Privacy note: supported tools run locally in this browser. PDF to Word, OCR, PDF compression and AI background removal need additional processing components and are marked as coming soon until they are connected and tested. Don't upload sensitive files to tools you don't trust.</p>
 </section>
 <section class="panel">
- <h2>How real cards work</h2>
- <p class="hint" style="margin:0">Real virtual Visa/Mastercard issuance requires an approved financial provider, identity/business checks, and usually funding or fees. This demo does not connect to a card issuer.</p>
-</section>
-</div>
-<div id="videoSection" hidden>
-<section class="panel">
- <div class="inbox-head"><h2>Video Downloader</h2><span class="timer">SAFETY FIRST</span></div>
- <div role="status" style="border:1px solid #f0c36d;background:#fff8e6;color:#7a4b00;border-radius:10px;padding:13px;margin:0 0 14px"><strong>Video safety screening is not active yet.</strong><div style="font-size:13px;margin-top:5px">Tempora must connect to a real video-analysis service before it can approve downloads. A link or title alone cannot confirm who appears in a video or whether all content is safe. Until the scanner is deployed, direct-file downloads are paused rather than falsely marked safe.</div></div>
- <p class="hint" style="margin:0 0 14px">Paste a public video link to identify the service. YouTube and streaming links will show official options; direct-file downloads remain blocked until a real safety scanner is connected.</p>
- <label for="videoUrl" class="small">Video or post URL</label>
- <input id="videoUrl" type="url" placeholder="https://..." autocomplete="url" style="display:block;width:100%;margin:6px 0 12px;padding:12px;border:1px solid var(--line);border-radius:9px;background:white;color:var(--text)">
- <button id="videoDownloadBtn" class="primary" type="button">Find downloadable media</button>
- <div id="videoError" class="error" hidden></div>
- <div id="videoResults" style="margin-top:14px"></div>
- <p class="hint">Spotify and Anghami links are recognized, but Tempora will not rip or bypass their streaming protections; use each service’s official offline-download option. Adult-site blocking uses known domains and URL patterns, so it cannot guarantee detection of every adult site.</p>
+ <h2>Available tools</h2>
+ <div class="sms-note">Merge and split PDFs · Rotate PDF pages · PDF to JPG · JPG/PNG to PDF · Convert image format · Resize and compress images</div>
 </section>
 </div>
 <div class="foot">Email service by <a href="https://mailboxtemp.com/docs/" target="_blank" rel="noopener">MailboxTemp</a>. Inboxes expire after a limited time; use them for low-risk testing only.</div>
@@ -149,25 +135,99 @@ async function openMessage(id){
 }
 async function copy(s){try{await navigator.clipboard.writeText(s);toast('Copied')}catch(e){const el=document.createElement('textarea');el.value=s;document.body.append(el);el.select();document.execCommand('copy');el.remove();toast('Copied')}}
 function reset(){if(timer)clearInterval(timer);timer=null;stopEmailTimer();token=null;account=null;active(false);$('email').value='';$('lastUpdated').textContent='No inbox yet';$('error').hidden=true;$('messages').innerHTML='<div class="empty"><strong>Your inbox is empty</strong>Your received emails will show up here.</div>';status('Ready when you are');toast('Ready for a new inbox')}
-function generateDemoCard(){
- const network=$('cardNetwork').value,country=$('cardCountry').value;
- // Published test-mode card numbers only; never usable as live payment cards.
- const testNumber=network==='Mastercard'?'5555 5555 5555 4444':'4242 4242 4242 4242';
- $('demoCardNetwork').textContent=network.toUpperCase();
- $('demoCardCountry').textContent=country;
- $('demoCardHolder').textContent='TEMPORA DEMO';
- $('demoCardExpiry').textContent='12/34';
- $('demoCardCvv').textContent='123';
- $('demoCardNumber').textContent=testNumber;
- $('demoCardResult').hidden=false;
-}
-$('generateCardBtn').onclick=generateDemoCard;
 function showTool(which){
- const sections={email:$('emailSection'),cards:$('smsSection'),video:$('videoSection')};
- const tabs={email:$('emailTab'),cards:$('smsTab'),video:$('videoTab')};
- Object.entries(sections).forEach(([key,el])=>{el.hidden=key!==which;tabs[key].classList.toggle('active',key===which);tabs[key].setAttribute('aria-selected',String(key===which))});
+ const email=$('emailSection'),tools=$('toolsSection');
+ email.hidden=which!=='email';tools.hidden=which!=='tools';
+ $('emailTab').classList.toggle('active',which==='email');$('toolsTab').classList.toggle('active',which==='tools');
+ $('emailTab').setAttribute('aria-selected',String(which==='email'));$('toolsTab').setAttribute('aria-selected',String(which==='tools'));
 }
-$('emailTab').onclick=()=>showTool('email');$('smsTab').onclick=()=>showTool('cards');$('videoTab').onclick=()=>showTool('video');
+const toolInfo={
+ 'merge-pdf':'Combine two or more PDF documents into one PDF.',
+ 'split-pdf':'Create a separate PDF file for every page in the selected PDF.',
+ 'rotate-pdf':'Rotate all pages in a PDF by 90, 180 or 270 degrees.',
+ 'pdf-to-jpg':'Render each page of a PDF as a JPG image.',
+ 'jpg-to-pdf':'Combine selected JPG or PNG images into one PDF.',
+ 'image-convert':'Convert an image to PNG, JPG or WebP (browser support may vary).',
+ 'image-resize':'Resize an image to the width and height you choose.',
+ 'image-compress':'Reduce image file size by exporting it at a chosen quality.',
+ 'remove-bg':'AI background removal is not connected yet. This option will be enabled after a background-removal service is configured.',
+ 'pdf-to-word':'Coming soon: PDF to editable Word conversion.',
+ 'word-to-pdf':'Coming soon: Word to PDF conversion.',
+ 'compress-pdf':'Coming soon: dedicated PDF compression.',
+ 'edit-pdf':'Coming soon: edit PDF text and add annotations.',
+ 'ocr-pdf':'Coming soon: OCR for scanned PDFs.'
+};
+function renderToolOptions(){
+ const tool=$('toolSelect').value, box=$('toolOptions');
+ $('toolDescription').textContent=toolInfo[tool]||'Choose a tool to continue.';
+ box.innerHTML='';
+ const field=(label,id,type='number',value='')=>{
+  const wrap=document.createElement('label');wrap.className='small';wrap.textContent=label;
+  const input=document.createElement('input');input.id=id;input.type=type;input.value=value;input.style.cssText='display:block;width:100%;margin-top:5px;padding:10px;border:1px solid var(--line);border-radius:9px;background:white;color:var(--text)';
+  wrap.append(input);box.append(wrap);
+ };
+ if(tool==='rotate-pdf')field('Rotation (degrees)','rotateDegrees','number','90');
+ if(tool==='image-resize'){field('Width (px)','imageWidth','number','1200');field('Height (px)','imageHeight','number','1200')}
+ if(tool==='image-compress')field('Quality (0.1–1)','imageQuality','number','0.75');
+ if(tool==='image-convert'){
+  const wrap=document.createElement('label');wrap.className='small';wrap.textContent='Output format';
+  const sel=document.createElement('select');sel.id='imageFormat';sel.style.cssText='display:block;width:100%;margin-top:5px;padding:10px;border:1px solid var(--line);border-radius:9px;background:white;color:var(--text)';
+  [['image/png','PNG'],['image/jpeg','JPG'],['image/webp','WebP']].forEach(([v,t])=>{const o=document.createElement('option');o.value=v;o.textContent=t;sel.append(o)});wrap.append(sel);box.append(wrap);
+ }
+ $('toolFiles').accept=tool.startsWith('pdf-')||tool==='merge-pdf'||tool==='split-pdf'||tool==='rotate-pdf'?'.pdf':tool==='jpg-to-pdf'?'image/*':tool==='remove-bg'||tool.startsWith('image-')?'image/*':'.pdf,image/*';
+ $('toolFiles').multiple=['merge-pdf','jpg-to-pdf'].includes(tool);
+ $('toolError').hidden=true;$('toolResult').innerHTML='';
+}
+function loadScript(src){return new Promise((resolve,reject)=>{const sc=document.createElement('script');sc.src=src;sc.onload=resolve;sc.onerror=()=>reject(Error('Could not load a required file-processing library. Check your internet connection and try again.'));document.head.append(sc)})}
+async function getPdfLib(){if(!window.PDFLib)await loadScript('https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js');return window.PDFLib}
+async function getPdfJs(){if(!window.pdfjsLib){await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'}return window.pdfjsLib}
+function saveBlob(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000)}
+async function imageFromFile(file){return new Promise((resolve,reject)=>{const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{URL.revokeObjectURL(url);resolve(img)};img.onerror=()=>{URL.revokeObjectURL(url);reject(Error('Could not read that image.'))};img.src=url})}
+async function runTool(){
+ const tool=$('toolSelect').value,files=Array.from($('toolFiles').files),btn=$('runToolBtn'),err=$('toolError'),out=$('toolResult');
+ err.hidden=true;out.innerHTML='';
+ const coming=['remove-bg','pdf-to-word','word-to-pdf','compress-pdf','edit-pdf','ocr-pdf'];
+ if(coming.includes(tool)){err.textContent=toolInfo[tool];err.hidden=false;return}
+ if(!files.length){err.textContent='Choose at least one file first.';err.hidden=false;return}
+ btn.disabled=true;btn.textContent='Processing…';
+ try{
+  const {PDFDocument,degrees}=await getPdfLib();
+  if(tool==='merge-pdf'){
+   if(files.length<2)throw Error('Choose at least two PDF files to merge.');
+   const merged=await PDFDocument.create();
+   for(const file of files){const doc=await PDFDocument.load(await file.arrayBuffer());const pages=await merged.copyPages(doc,doc.getPageIndices());pages.forEach(p=>merged.addPage(p))}
+   saveBlob(new Blob([await merged.save()],{type:'application/pdf'}),'merged.pdf');
+  }else if(tool==='split-pdf'){
+   const doc=await PDFDocument.load(await files[0].arrayBuffer());
+   for(let i=0;i<doc.getPageCount();i++){const one=await PDFDocument.create();one.addPage((await one.copyPages(doc,[i]))[0]);saveBlob(new Blob([await one.save()],{type:'application/pdf'}),'page-'+(i+1)+'.pdf')}
+  }else if(tool==='rotate-pdf'){
+   const doc=await PDFDocument.load(await files[0].arrayBuffer());let deg=Number($('rotateDegrees')?.value||90);if(![90,180,270].includes(deg))throw Error('Choose 90, 180 or 270 degrees.');
+   doc.getPages().forEach(p=>p.setRotation(degrees((p.getRotation().angle+deg)%360)));saveBlob(new Blob([await doc.save()],{type:'application/pdf'}),'rotated.pdf');
+  }else if(tool==='jpg-to-pdf'){
+   const doc=await PDFDocument.create();
+   for(const file of files){const bytes=await file.arrayBuffer();let img;if(file.type==='image/png')img=await doc.embedPng(bytes);else if(['image/jpeg','image/jpg'].includes(file.type))img=await doc.embedJpg(bytes);else{const loaded=await imageFromFile(file),canvas=document.createElement('canvas');canvas.width=loaded.naturalWidth;canvas.height=loaded.naturalHeight;canvas.getContext('2d').drawImage(loaded,0,0);img=await doc.embedJpg(await (await new Promise(r=>canvas.toBlob(r,'image/jpeg',0.92))).arrayBuffer())}
+   const page=doc.addPage([img.width,img.height]);page.drawImage(img,{x:0,y:0,width:img.width,height:img.height})}
+   saveBlob(new Blob([await doc.save()],{type:'application/pdf'}),'images.pdf');
+  }else if(tool==='pdf-to-jpg'){
+   const pdfjs=await getPdfJs(),pdf=await pdfjs.getDocument({data:await files[0].arrayBuffer()}).promise;
+   for(let i=1;i<=pdf.numPages;i++){const page=await pdf.getPage(i),viewport=page.getViewport({scale:1.5}),canvas=document.createElement('canvas');canvas.width=viewport.width;canvas.height=viewport.height;await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;const blob=await new Promise(r=>canvas.toBlob(r,'image/jpeg',0.92));saveBlob(blob,'page-'+i+'.jpg')}
+  }else if(tool.startsWith('image-')){
+   const file=files[0],img=await imageFromFile(file),canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
+   if(tool==='image-resize'){canvas.width=Math.max(1,Number($('imageWidth').value)||1200);canvas.height=Math.max(1,Number($('imageHeight').value)||1200)}
+   else{canvas.width=img.naturalWidth;canvas.height=img.naturalHeight}
+   if(tool==='image-convert'&&$('imageFormat').value==='image/jpeg'){ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height)}
+   ctx.drawImage(img,0,0,canvas.width,canvas.height);
+   const mime=tool==='image-convert'?$('imageFormat').value:'image/jpeg';let quality=tool==='image-compress'?Number($('imageQuality').value):0.85;quality=Math.min(1,Math.max(0.1,quality));
+   const blob=await new Promise(r=>canvas.toBlob(r,mime,quality));if(!blob)throw Error('This image format is not supported by your browser.');
+   const ext=mime==='image/png'?'png':mime==='image/webp'?'webp':'jpg';saveBlob(blob,'tempora-image.'+ext);
+  }
+  out.textContent='Processing finished. Your download should start automatically.';
+ }catch(e){err.textContent=e?.message||'Could not process this file.';err.hidden=false}
+ finally{btn.disabled=false;btn.textContent='Process files'}
+}
+$('emailTab').onclick=()=>showTool('email');$('toolsTab').onclick=()=>showTool('tools');
+$('toolSelect').onchange=renderToolOptions;$('runToolBtn').onclick=runTool;renderToolOptions();
+
 async function downloadVideo(){
  const url=$('videoUrl').value.trim(),btn=$('videoDownloadBtn'),err=$('videoError'),out=$('videoResults');
  err.hidden=true;out.innerHTML='';
@@ -190,5 +250,5 @@ async function downloadVideo(){
  }catch(e){err.textContent=e.message||'Could not process this link.';err.hidden=false}
  finally{btn.disabled=false;btn.textContent='Check link'}
 }
-$('videoDownloadBtn').onclick=downloadVideo;$('createBtn').onclick=generate;$('refreshBtn').onclick=refresh;$('extendTimerBtn').onclick=extendEmailTimer;$('copyBtn').onclick=()=>copy($('email').value);$('deleteBtn').onclick=reset;$('closeModal').onclick=()=>$('modal').classList.remove('open');$('modal').onclick=e=>{if(e.target===$('modal'))$('modal').classList.remove('open')};
+$('createBtn').onclick=generate;$('refreshBtn').onclick=refresh;$('extendTimerBtn').onclick=extendEmailTimer;$('copyBtn').onclick=()=>copy($('email').value);$('deleteBtn').onclick=reset;$('closeModal').onclick=()=>$('modal').classList.remove('open');$('modal').onclick=e=>{if(e.target===$('modal'))$('modal').classList.remove('open')};
 </script></body></html>

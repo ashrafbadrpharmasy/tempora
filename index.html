@@ -337,8 +337,10 @@ async function runTool(){
   }else if(tool==='remove-bg'){
    btn.textContent=window.currentLanguage==='ar'?'جارٍ تحميل أداة إزالة الخلفية…':'Loading background remover…';updateProcessing(4,window.currentLanguage==='ar'?'تحميل أداة الذكاء الاصطناعي':'Loading AI engine');
    const removeBackground=(await import('https://esm.sh/@imgly/background-removal@1.5.5')).removeBackground;
-   updateProcessing(12,window.currentLanguage==='ar'?'تحميل نموذج أخف لإزالة الخلفية':'Loading a lighter background model');
-   const result=await removeBackground(files[0],{model:'isnet_quint8',output:{format:'image/png'},progress:(key,current,total)=>{if(total>0){const ratio=current/total;updateProcessing(Math.min(82,12+ratio*68),(window.currentLanguage==='ar'?'تحميل مكونات الذكاء الاصطناعي: ':'Loading AI assets: ')+Math.round(ratio*100)+'%')}}});
+   updateProcessing(12,window.currentLanguage==='ar'?'تجهيز صورة بحجم مناسب لتسريع المعالجة':'Optimizing image size for faster processing');
+   let bgInput=files[0];const bgImage=await imageFromFile(files[0]);const maxSide=1600;if(Math.max(bgImage.naturalWidth,bgImage.naturalHeight)>maxSide){const scale=maxSide/Math.max(bgImage.naturalWidth,bgImage.naturalHeight),canvas=document.createElement('canvas');canvas.width=Math.round(bgImage.naturalWidth*scale);canvas.height=Math.round(bgImage.naturalHeight*scale);canvas.getContext('2d').drawImage(bgImage,0,0,canvas.width,canvas.height);const resized=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));if(resized)bgInput=new File([resized],'tempora-optimized.png',{type:'image/png'})}
+   updateProcessing(16,window.currentLanguage==='ar'?'تحميل نموذج أخف لإزالة الخلفية':'Loading a lighter background model');
+   const result=await removeBackground(bgInput,{model:'isnet_quint8',output:{format:'image/png'},progress:(key,current,total)=>{if(total>0){const ratio=current/total;updateProcessing(Math.min(82,12+ratio*68),(window.currentLanguage==='ar'?'تحميل مكونات الذكاء الاصطناعي: ':'Loading AI assets: ')+Math.round(ratio*100)+'%')}}});
    updateProcessing(94,window.currentLanguage==='ar'?'تجهيز الصورة النهائية':'Preparing final image');saveBlob(result,'background-removed.png');
   }else if(tool.startsWith('image-')){
    const file=files[0],img=await imageFromFile(file),canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');

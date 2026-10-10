@@ -59,13 +59,13 @@
 <div id="videoSection" hidden>
 <section class="panel">
  <div class="inbox-head"><h2>All Video Downloader</h2><span class="timer">PUBLIC LINKS</span></div>
- <p class="hint" style="margin:0 0 14px">Paste a public post link from a supported social platform. Only download media you own or have permission to save. Private posts and unsupported platforms won't work.</p>
+ <p class="hint" style="margin:0 0 14px">Paste a direct media-file link or a supported service link. Tempora is free and blocks known adult domains. Direct file links can be opened for download; streaming services may require their official offline-download feature.</p>
  <label for="videoUrl" class="small">Video or post URL</label>
  <input id="videoUrl" type="url" placeholder="https://..." autocomplete="url" style="display:block;width:100%;margin:6px 0 12px;padding:12px;border:1px solid var(--line);border-radius:9px;background:white;color:var(--text)">
  <button id="videoDownloadBtn" class="primary" type="button">Find downloadable media</button>
  <div id="videoError" class="error" hidden></div>
  <div id="videoResults" style="margin-top:14px"></div>
- <p class="hint">Unsupported services, including music streaming links, are rejected. Adult-content links are blocked by a basic URL filter and any additional domains configured by the site owner; no URL filter can guarantee detection of every adult site.</p>
+ <p class="hint">Spotify and Anghami links are recognized, but Tempora will not rip or bypass their streaming protections; use each service’s official offline-download option. Adult-site blocking uses known domains and URL patterns, so it cannot guarantee detection of every adult site.</p>
 </section>
 </div>
 <div class="foot">Email service by <a href="https://mailboxtemp.com/docs/" target="_blank" rel="noopener">MailboxTemp</a>. Inboxes expire after a limited time; use them for low-risk testing only.</div>
@@ -176,19 +176,17 @@ async function downloadVideo(){
   const res=await fetch('/api/download',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})});
   const data=await res.json().catch(()=>({}));
   if(!res.ok)throw Error(data.error||'Could not process this link.');
-  const media=data.data||data;
-  const items=[...(Array.isArray(media.videos)?media.videos.map(x=>({...x,kind:'Video'})):[]),...(Array.isArray(media.images)?media.images.map(x=>({...x,kind:'Image'})):[]),...(Array.isArray(media.audios)?media.audios.map(x=>({...x,kind:'Audio'})):[])];
-  if(!items.length)throw Error('No downloadable media was returned for this link.');
-  const title=document.createElement('p');title.className='hint';title.textContent=(media.title||media.platform||'Media found')+' — choose a result below.';out.append(title);
-  items.forEach((item,i)=>{
-   if(!item.url)return;
+  const note=document.createElement('p');note.className='hint';note.textContent=data.message||'Link checked.';out.append(note);
+  if(data.type==='direct-file'){
    const row=document.createElement('div');row.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line);flex-wrap:wrap';
-   const label=document.createElement('div');label.textContent=item.kind+(item.quality?' · '+item.quality:'');
-   const a=document.createElement('a');a.href=item.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Open / download';a.style.cssText='color:var(--accent);font-weight:700';
+   const label=document.createElement('div');label.textContent='Direct media file'+(data.fileName?' · '+data.fileName:'');
+   const a=document.createElement('a');a.href=data.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Open / download file';a.style.cssText='color:var(--accent);font-weight:700';
    row.append(label,a);out.append(row);
-  });
+  } else if(data.type==='official-service'){
+   const a=document.createElement('a');a.href=data.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Open official service';a.style.cssText='color:var(--accent);font-weight:700';out.append(a);
+  } else if(data.type==='unsupported'){throw Error(data.message||'This link cannot be downloaded directly by the free version.')}
  }catch(e){err.textContent=e.message||'Could not process this link.';err.hidden=false}
- finally{btn.disabled=false;btn.textContent='Find downloadable media'}
+ finally{btn.disabled=false;btn.textContent='Check link'}
 }
 $('videoDownloadBtn').onclick=downloadVideo;$('createBtn').onclick=generate;$('refreshBtn').onclick=refresh;$('extendTimerBtn').onclick=extendEmailTimer;$('copyBtn').onclick=()=>copy($('email').value);$('deleteBtn').onclick=reset;$('closeModal').onclick=()=>$('modal').classList.remove('open');$('modal').onclick=e=>{if(e.target===$('modal'))$('modal').classList.remove('open')};
 </script></body></html>

@@ -13,19 +13,21 @@
 <header><div class="brand">tempora<span>.</span></div><span class="small">Free temporary email</span></header>
 <main class="wrap">
 <section class="intro"><h1>A simple inbox for temporary email.</h1><p>Get an address, receive a message, and copy your verification code.</p></section>
-<section class="panel">
-<div class="status"><i id="dot" class="dot"></i><span id="status">Ready when you are</span></div>
-<h2>Your email address</h2>
+<div class="tabs" role="tablist" aria-label="Inbox type"><button class="tab active" id="emailTab" role="tab" aria-selected="true">Email</button><button class="tab" id="smsTab" role="tab" aria-selected="false">Temporary SMS</button></div>
+<div id="emailSection">
+<section class="panel"><div class="status"><i id="dot" class="dot"></i><span id="status">Ready when you are</span></div><h2>Your email address</h2>
 <div class="address"><input id="email" placeholder="Click Generate inbox to begin" readonly aria-label="Temporary email address"><button id="copyBtn" disabled>Copy</button></div>
 <div class="actions"><button id="createBtn" class="primary">Generate inbox</button><button id="refreshBtn" disabled>↻ Refresh</button><button id="deleteBtn" disabled>New inbox</button></div>
-<p class="hint">Keep this tab open to receive messages. Temporary email may be blocked by some websites. Do not use it for private or important accounts.</p>
-<div id="error" class="error" hidden></div>
-</section>
-<section class="panel">
-<div class="inbox-head"><h2>Inbox</h2><span id="lastUpdated" class="small">No inbox yet</span></div>
-<div id="messages"><div class="empty"><strong>Your inbox is empty</strong>Your received emails will show up here.</div></div>
-</section>
-<div class="foot">Email delivery is provided by <a href="https://mail.tm/" target="_blank" rel="noopener">Mail.tm</a>. Temporary SMS is not available.</div>
+<p class="hint">Keep this tab open to receive messages. Temporary email may be blocked by some websites. Do not use it for private or important accounts.</p><div id="error" class="error" hidden></div></section>
+<section class="panel"><div class="inbox-head"><h2>Inbox</h2><span id="lastUpdated" class="small">No inbox yet</span></div><div id="messages"><div class="empty"><strong>Your inbox is empty</strong>Your received emails will show up here.</div></div></section>
+</div>
+<div id="smsSection" hidden><section class="panel"><div class="inbox-head"><h2>Temporary phone number</h2><span class="timer" id="smsTimer">10:00</span></div>
+<div class="sms-note" style="margin:14px 0">SMS is not connected yet. This section needs a real provider before it can issue a phone number or receive messages.</div>
+<div class="address"><input id="phoneNumber" placeholder="A number will appear here when connected" readonly aria-label="Temporary phone number"><button disabled>Copy</button></div>
+<div class="actions"><button class="primary" disabled>Get number</button><button disabled>↻ Refresh SMS</button></div>
+<h2 style="margin-top:22px">Received SMS</h2><div class="empty"><strong>No messages</strong>Messages will appear here after an SMS provider is connected.</div>
+<p class="hint">The 10-minute timer is a visual preview only. No number is currently reserved and no SMS can be received yet.</p></section></div>
+<div class="foot">Email service by <a href="https://mail.tm/" target="_blank" rel="noopener">Mail.tm</a>. Use temporary inboxes for low-risk testing only.</div>
 </main>
 <div id="modal"><div class="dialog"><div class="dialogtop"><h2 id="modalTitle">Email</h2><button id="closeModal">Close</button></div><div id="modalBody"></div></div></div><div id="toast" class="toast"></div>
 <script>

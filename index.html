@@ -335,29 +335,32 @@ async function runTool(){
    const blob=new Blob([fullText],{type:'text/plain;charset=utf-8'});saveBlob(blob,'recognized-text.txt');
    const pre=document.createElement('pre');pre.style.cssText='white-space:pre-wrap;overflow-wrap:anywhere;max-height:320px;overflow:auto;padding:14px;background:#f7f8fa;border-radius:10px';pre.textContent=fullText;out.append(pre);
   }else if(tool==='remove-bg'){
-   btn.textContent=window.currentLanguage==='ar'?'جارٍ رفع الصورة وإزالة الخلفية…':'Uploading image and removing background…';
-   updateProcessing(8,window.currentLanguage==='ar'?'جارٍ إرسال الصورة للخدمة الخارجية':'Sending image to external service');
+   btn.textContent=window.currentLanguage==='ar'?'جارٍ تجهيز الذكاء الاصطناعي وإزالة الخلفية…':'Loading AI and removing background…';
+   updateProcessing(3,window.currentLanguage==='ar'?'جارٍ تحميل أداة إزالة الخلفية':'Loading the background-removal engine');
    const file=files[0];
-   if(file.size>10*1024*1024)throw Error(window.currentLanguage==='ar'?'حجم الصورة أكبر من 10 ميجابايت. اختر صورة أصغر.':'Image is larger than 10 MB. Please choose a smaller image.');
-   const form=new FormData();form.append('image',file,file.name||'image.png');
-   updateProcessing(18,window.currentLanguage==='ar'?'جارٍ إزالة الخلفية على الخادم الخارجي':'Removing background on external server');
-   let response;
    try{
-    response=await fetch('https://bgremovers.org/api/v1/remove-background',{method:'POST',body:form});
-   }catch(networkError){
-    throw Error(window.currentLanguage==='ar'?'تعذّر الاتصال بخدمة إزالة الخلفية الخارجية. جرّب مرة أخرى لاحقًا.':'Could not connect to the external background-removal service. Please try again later.');
+    if(!window.BgRemove)await loadScript('https://bgremovers.org/sdk/v1.js');
+    if(!window.BgRemove||typeof window.BgRemove.removeBackground!=='function')throw Error('The background-removal SDK did not load correctly.');
+    const result=await window.BgRemove.removeBackground(file,{
+     maxDimension:4096,
+     onProgress:(p)=>{
+      const stage=p?.stage||'';
+      const raw=Number(p?.progress);
+      const pct=Number.isFinite(raw)?Math.max(0,Math.min(100,raw<=1?raw*100:raw)):0;
+      if(stage==='loading-runtime')updateProcessing(Math.max(8,Math.min(25,8+pct*.17)),window.currentLanguage==='ar'?'جارٍ تجهيز محرك الذكاء الاصطناعي':'Preparing the AI runtime');
+      else if(stage==='loading-model')updateProcessing(Math.max(25,Math.min(72,25+pct*.47)),window.currentLanguage==='ar'?'جارٍ تحميل نموذج الذكاء الاصطناعي':'Loading the AI model');
+      else if(stage==='downloading')updateProcessing(Math.max(25,Math.min(72,25+pct*.47)),window.currentLanguage==='ar'?'جارٍ تنزيل النموذج':'Downloading the model');
+      else if(stage==='ready')updateProcessing(85,window.currentLanguage==='ar'?'جارٍ إزالة الخلفية':'Removing the background');
+      else updateProcessing(Math.max(8,Math.min(80,8+pct*.72)),window.currentLanguage==='ar'?'جارٍ معالجة الصورة على جهازك':'Processing the image on your device');
+     }
+    });
+    if(!result||!result.size)throw Error('The background-removal engine returned an empty image.');
+    updateProcessing(98,window.currentLanguage==='ar'?'اكتملت إزالة الخلفية':'Background removed');
+    saveBlob(result,'background-removed.png');
+   }catch(sdkError){
+    const detail=sdkError?.message||'Unknown error';
+    throw Error((window.currentLanguage==='ar'?'تعذّرت إزالة الخلفية داخل المتصفح. تأكد من اتصال الإنترنت ثم جرّب صورة أصغر. ':'Could not remove the background in your browser. Check your internet connection and try a smaller image. ')+detail);
    }
-   if(!response.ok){
-    let message='';
-    try{const data=await response.json();message=data?.error?.message||data?.error?.code||''}catch(_){}
-    if(response.status===429)throw Error(window.currentLanguage==='ar'?'وصلت الخدمة إلى الحد المجاني اليومي. جرّب غدًا.':'The service has reached its daily free limit. Please try again tomorrow.');
-    if(response.status===413)throw Error(window.currentLanguage==='ar'?'حجم الصورة كبير جدًا للخدمة الخارجية. اختر صورة أصغر من 10 ميجابايت.':'The image is too large for the external service. Choose an image under 10 MB.');
-    throw Error((window.currentLanguage==='ar'?'الخدمة الخارجية لم تتمكن من معالجة الصورة. ':'The external service could not process this image. ')+(message||('HTTP '+response.status)));
-   }
-   const result=await response.blob();
-   if(!result.size)throw Error(window.currentLanguage==='ar'?'الخدمة أعادت نتيجة فارغة. جرّب مرة أخرى.':'The service returned an empty result. Please try again.');
-   updateProcessing(98,window.currentLanguage==='ar'?'اكتملت إزالة الخلفية':'Background removed');
-   saveBlob(result,'background-removed.png');
   }else if(tool.startsWith('image-')){
    const file=files[0],img=await imageFromFile(file),canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
    if(tool==='image-resize'){canvas.width=Math.max(1,Number($('imageWidth').value)||1200);canvas.height=Math.max(1,Number($('imageHeight').value)||1200)}

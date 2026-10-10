@@ -42,14 +42,11 @@
  <p>PDF and image tools, all in one simple place. Choose a tool to get started.</p>
  <div class="tools-search"><span aria-hidden="true">⌕</span><input id="toolSearch" type="search" placeholder="Search tools, e.g. merge PDF…" aria-label="Search tools"></div>
 </section>
-<div class="tool-categories" role="group" aria-label="Filter tools">
- <button class="tool-filter active" data-filter="all">All tools</button><button class="tool-filter" data-filter="pdf">PDF tools</button><button class="tool-filter" data-filter="image">Image tools</button><button class="tool-filter" data-filter="convert">Convert files</button>
-</div>
 <section class="tool-group"><div class="tool-group-heading"><div><h2>Popular tools</h2><p>Quick access to the tools people use most</p></div></div>
  <div class="tool-grid" id="toolGrid">
   <button class="tool-card" data-tool="merge-pdf" data-category="pdf" data-name="merge pdf combine join files"><span class="tool-icon icon-merge">↗</span><span class="tool-card-title">Merge PDF</span><span class="tool-card-desc">Combine PDFs in the order you want.</span><span class="tool-card-link">Choose files <span>→</span></span></button>
   <button class="tool-card" data-tool="split-pdf" data-category="pdf" data-name="split pdf separate pages"><span class="tool-icon icon-split">▤</span><span class="tool-card-title">Split PDF</span><span class="tool-card-desc">Separate pages into individual files.</span><span class="tool-card-link">Choose file <span>→</span></span></button>
-  <button class="tool-card" data-tool="compress-pdf" data-category="pdf" data-name="compress pdf reduce size" data-coming="true"><span class="tool-icon icon-compress">⇣</span><span class="tool-card-title">Compress PDF</span><span class="tool-card-desc">Reduce a PDF’s file size.</span><span class="tool-coming">Coming soon</span></button>
+  <button class="tool-card" data-tool="compress-pdf" data-category="pdf" data-name="compress pdf reduce size"><span class="tool-icon icon-compress">⇣</span><span class="tool-card-title">Compress PDF</span><span class="tool-card-desc">Reduce a PDF’s file size.</span><span class="tool-card-link">Choose file <span>→</span></span></button>
   <button class="tool-card" data-tool="pdf-to-jpg" data-category="convert" data-name="pdf to jpg image convert"><span class="tool-icon icon-pdfimg">▧</span><span class="tool-card-title">PDF to JPG</span><span class="tool-card-desc">Turn each PDF page into an image.</span><span class="tool-card-link">Choose file <span>→</span></span></button>
   <button class="tool-card" data-tool="jpg-to-pdf" data-category="convert" data-name="jpg png image to pdf"><span class="tool-icon icon-imgpdf">▣</span><span class="tool-card-title">JPG to PDF</span><span class="tool-card-desc">Create a PDF from your images.</span><span class="tool-card-link">Choose images <span>→</span></span></button>
   <button class="tool-card" data-tool="pdf-to-word" data-category="convert" data-name="pdf to word docx" data-coming="true"><span class="tool-icon icon-word">W</span><span class="tool-card-title">PDF to Word</span><span class="tool-card-desc">Convert a PDF into an editable document.</span><span class="tool-coming">Coming soon</span></button>
@@ -168,12 +165,12 @@ const toolInfo={
  'image-convert':'Convert an image to PNG, JPG or WebP (browser support may vary).',
  'image-resize':'Resize an image to the width and height you choose.',
  'image-compress':'Reduce image file size by exporting it at a chosen quality.',
- 'remove-bg':'AI background removal is not connected yet. This option will be enabled after a background-removal service is configured.',
- 'pdf-to-word':'Coming soon: PDF to editable Word conversion.',
- 'word-to-pdf':'Coming soon: Word to PDF conversion.',
- 'compress-pdf':'Coming soon: dedicated PDF compression.',
- 'edit-pdf':'Coming soon: edit PDF text and add annotations.',
- 'ocr-pdf':'Coming soon: OCR for scanned PDFs.'
+ 'remove-bg':'Remove an image background in your browser using an AI model. The first run downloads the model.',
+ 'pdf-to-word':'Extract PDF text and save it as an editable Word document. Complex layouts may not be preserved.',
+ 'word-to-pdf':'Convert a DOCX document to PDF in your browser. Layout fidelity depends on the source file.',
+ 'compress-pdf':'Rewrite and optimize a PDF file. Size reduction varies by document.',
+ 'edit-pdf':'Add text to PDF pages or apply a text watermark.',
+ 'ocr-pdf':'Recognize text in scanned PDF pages using browser-based OCR.'
 };
 function renderToolOptions(){
  const tool=$('toolSelect')?.value || window.currentTool || 'merge-pdf', box=$('toolOptions');
@@ -182,7 +179,7 @@ function renderToolOptions(){
  const titles={'merge-pdf':'Merge PDF','split-pdf':'Split PDF','rotate-pdf':'Rotate PDF','pdf-to-jpg':'PDF to JPG','jpg-to-pdf':'JPG to PDF','image-convert':'Image Converter','image-resize':'Resize Image','image-compress':'Compress Image','remove-bg':'Remove Background','pdf-to-word':'PDF to Word','word-to-pdf':'Word to PDF','compress-pdf':'Compress PDF','edit-pdf':'Edit PDF','ocr-pdf':'PDF OCR'};
  $('workspaceTitle').textContent=titles[tool]||'File Tool';
  $('fileHint').textContent=['merge-pdf','jpg-to-pdf'].includes(tool)?'You can select multiple files.':'Select a file from your device.';
- if(['remove-bg','pdf-to-word','word-to-pdf','compress-pdf','edit-pdf','ocr-pdf'].includes(tool)){$('toolFiles').disabled=true;$('runToolBtn').disabled=true;$('runToolBtn').textContent='Coming soon';$('toolError').hidden=false;$('toolError').textContent=toolInfo[tool]}else{$('toolFiles').disabled=false;$('runToolBtn').disabled=false;$('runToolBtn').textContent='Process files';$('toolError').hidden=true}
+ $('toolFiles').disabled=false;$('runToolBtn').disabled=false;$('runToolBtn').textContent='Process files';$('toolError').hidden=true;
 
  const field=(label,id,type='number',value='')=>{
   const wrap=document.createElement('label');wrap.className='small';wrap.textContent=label;
@@ -197,7 +194,7 @@ function renderToolOptions(){
   const sel=document.createElement('select');sel.id='imageFormat';sel.style.cssText='display:block;width:100%;margin-top:5px;padding:10px;border:1px solid var(--line);border-radius:9px;background:white;color:var(--text)';
   [['image/png','PNG'],['image/jpeg','JPG'],['image/webp','WebP']].forEach(([v,t])=>{const o=document.createElement('option');o.value=v;o.textContent=t;sel.append(o)});wrap.append(sel);box.append(wrap);
  }
- $('toolFiles').accept=['merge-pdf','split-pdf','rotate-pdf','pdf-to-jpg'].includes(tool)?'.pdf':tool==='jpg-to-pdf'||tool.startsWith('image-')||tool==='remove-bg'?'image/*':'.pdf,image/*';
+ $('toolFiles').accept=['merge-pdf','split-pdf','rotate-pdf','pdf-to-jpg','compress-pdf','edit-pdf','ocr-pdf','pdf-to-word'].includes(tool)?'.pdf':tool==='word-to-pdf'?'.docx,.doc,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword':tool==='jpg-to-pdf'||tool.startsWith('image-')||tool==='remove-bg'?'image/*':'.pdf,image/*';
  $('toolFiles').multiple=['merge-pdf','jpg-to-pdf'].includes(tool);
  $('toolResult').innerHTML='';
 }
@@ -209,12 +206,11 @@ async function imageFromFile(file){return new Promise((resolve,reject)=>{const i
 async function runTool(){
  const tool=window.currentTool||'merge-pdf',files=Array.from($('toolFiles').files),btn=$('runToolBtn'),err=$('toolError'),out=$('toolResult');
  err.hidden=true;out.innerHTML='';
- const coming=['remove-bg','pdf-to-word','word-to-pdf','compress-pdf','edit-pdf','ocr-pdf'];
- if(coming.includes(tool)){err.textContent=toolInfo[tool];err.hidden=false;return}
  if(!files.length){err.textContent='Choose at least one file first.';err.hidden=false;return}
  btn.disabled=true;btn.textContent='Processing…';
  try{
-  const {PDFDocument,degrees}=await getPdfLib();
+  let PDFDocument,degrees;
+  if(['merge-pdf','split-pdf','rotate-pdf','jpg-to-pdf','compress-pdf','edit-pdf'].includes(tool))({PDFDocument,degrees}=await getPdfLib());
   if(tool==='merge-pdf'){
    if(files.length<2)throw Error('Choose at least two PDF files to merge.');
    const merged=await PDFDocument.create();
@@ -234,6 +230,43 @@ async function runTool(){
   }else if(tool==='pdf-to-jpg'){
    const pdfjs=await getPdfJs(),pdf=await pdfjs.getDocument({data:await files[0].arrayBuffer()}).promise;
    for(let i=1;i<=pdf.numPages;i++){const page=await pdf.getPage(i),viewport=page.getViewport({scale:1.5}),canvas=document.createElement('canvas');canvas.width=viewport.width;canvas.height=viewport.height;await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;const blob=await new Promise(r=>canvas.toBlob(r,'image/jpeg',0.92));saveBlob(blob,'page-'+i+'.jpg')}
+  }else if(tool==='compress-pdf'){
+   const doc=await PDFDocument.load(await files[0].arrayBuffer());
+   const bytes=await doc.save({useObjectStreams:true,addDefaultPage:false});
+   saveBlob(new Blob([bytes],{type:'application/pdf'}),'compressed.pdf');
+  }else if(tool==='edit-pdf'){
+   const doc=await PDFDocument.load(await files[0].arrayBuffer());
+   const textToAdd=prompt('Enter the text to add to every page:','Tempora');
+   if(textToAdd===null)throw Error('Editing cancelled.');
+   const watermark=confirm('Apply as a watermark? Choose Cancel to add normal text near the bottom.');
+   const font=await doc.embedFont((await getPdfLib()).StandardFonts.Helvetica);
+   doc.getPages().forEach(page=>{const {width,height}=page.getSize();page.drawText(textToAdd,{x:36,y:watermark?height/2:36,size:watermark?26:12,font,opacity:watermark?0.28:1,rotate:watermark?degrees(35):degrees(0)})});
+   saveBlob(new Blob([await doc.save()],{type:'application/pdf'}),'edited.pdf');
+  }else if(tool==='pdf-to-word'){
+   const pdfjs=await getPdfJs(),pdf=await pdfjs.getDocument({data:await files[0].arrayBuffer()}).promise;
+   await loadScript('https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.iife.js');
+   const {Document,Paragraph,Packer,TextRun}=window.docx,paras=[];
+   for(let i=1;i<=pdf.numPages;i++){const page=await pdf.getPage(i),content=await page.getTextContent(),line=content.items.map(x=>x.str).join(' ').trim();if(line)paras.push(new Paragraph({children:[new TextRun(line)]}));if(i<pdf.numPages)paras.push(new Paragraph({children:[new TextRun('')]}))}
+   if(!paras.length)throw Error('No selectable text found. For scanned PDFs, run PDF OCR first.');
+   const doc=new Document({sections:[{children:paras}]});saveBlob(await Packer.toBlob(doc),'converted.docx');
+  }else if(tool==='word-to-pdf'){
+   await loadScript('https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js');
+   await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js');
+   const file=files[0],arrayBuffer=await file.arrayBuffer(),result=await window.mammoth.convertToHtml({arrayBuffer});
+   const wrapper=document.createElement('div');wrapper.style.cssText='font-family:Arial,sans-serif;color:#111;background:white;width:700px;padding:28px;font-size:12pt;line-height:1.5';wrapper.innerHTML=result.value;
+   document.body.append(wrapper);
+   try{await window.html2pdf().set({margin:10,filename:'converted.pdf',image:{type:'jpeg',quality:0.95},html2canvas:{scale:1.5,useCORS:true},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}}).from(wrapper).save()}finally{wrapper.remove()}
+  }else if(tool==='ocr-pdf'){
+   const pdfjs=await getPdfJs();await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js');
+   const pdf=await pdfjs.getDocument({data:await files[0].arrayBuffer()}).promise,worker=await window.Tesseract.createWorker('eng');let fullText='';
+   try{for(let i=1;i<=pdf.numPages;i++){const page=await pdf.getPage(i),viewport=page.getViewport({scale:1.6}),canvas=document.createElement('canvas');canvas.width=viewport.width;canvas.height=viewport.height;await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;const result=await worker.recognize(canvas);fullText+='--- Page '+i+' ---\\n'+result.data.text+'\\n\\n'} }finally{await worker.terminate()}
+   const blob=new Blob([fullText],{type:'text/plain;charset=utf-8'});saveBlob(blob,'recognized-text.txt');
+   const pre=document.createElement('pre');pre.style.cssText='white-space:pre-wrap;overflow-wrap:anywhere;max-height:320px;overflow:auto;padding:14px;background:#f7f8fa;border-radius:10px';pre.textContent=fullText;out.append(pre);
+  }else if(tool==='remove-bg'){
+   btn.textContent='Loading AI model…';
+   const removeBackground= (await import('https://esm.sh/@imgly/background-removal@1.5.5')).removeBackground;
+   const result=await removeBackground(files[0],{output:{format:'image/png'}});
+   saveBlob(result,'background-removed.png');
   }else if(tool.startsWith('image-')){
    const file=files[0],img=await imageFromFile(file),canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
    if(tool==='image-resize'){canvas.width=Math.max(1,Number($('imageWidth').value)||1200);canvas.height=Math.max(1,Number($('imageHeight').value)||1200)}
@@ -249,13 +282,11 @@ async function runTool(){
  finally{btn.disabled=false;btn.textContent='Process files'}
 }
 $('emailTab').onclick=()=>showTool('email');$('toolsTab').onclick=()=>showTool('tools');
-let currentFilter='all';
 function filterToolCards(){
  const query=$('toolSearch').value.trim().toLowerCase();let count=0;
- document.querySelectorAll('.tool-card').forEach(card=>{const category=card.dataset.category,name=(card.dataset.name+' '+card.textContent).toLowerCase();const show=(currentFilter==='all'||category===currentFilter||(currentFilter==='convert'&&category==='convert'))&&(!query||name.includes(query));card.hidden=!show;if(show)count++});
+ document.querySelectorAll('.tool-card').forEach(card=>{const name=(card.dataset.name+' '+card.textContent).toLowerCase();const show=!query||name.includes(query);card.hidden=!show;if(show)count++});
  $('noToolsFound').hidden=count>0;
 }
-document.querySelectorAll('.tool-filter').forEach(btn=>btn.onclick=()=>{currentFilter=btn.dataset.filter;document.querySelectorAll('.tool-filter').forEach(b=>b.classList.toggle('active',b===btn));filterToolCards()});
 $('toolSearch').oninput=filterToolCards;
 document.querySelectorAll('.tool-card').forEach(card=>card.onclick=()=>{
  const tool=card.dataset.tool;window.currentTool=tool;

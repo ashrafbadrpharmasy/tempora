@@ -335,32 +335,43 @@ async function runTool(){
    const blob=new Blob([fullText],{type:'text/plain;charset=utf-8'});saveBlob(blob,'recognized-text.txt');
    const pre=document.createElement('pre');pre.style.cssText='white-space:pre-wrap;overflow-wrap:anywhere;max-height:320px;overflow:auto;padding:14px;background:#f7f8fa;border-radius:10px';pre.textContent=fullText;out.append(pre);
   }else if(tool==='remove-bg'){
-   btn.textContent=window.currentLanguage==='ar'?'جارٍ تجهيز الذكاء الاصطناعي وإزالة الخلفية…':'Loading AI and removing background…';
-   updateProcessing(3,window.currentLanguage==='ar'?'جارٍ تحميل أداة إزالة الخلفية':'Loading the background-removal engine');
+   btn.textContent=window.currentLanguage==='ar'?'جارٍ إزالة الخلفية…':'Removing background…';
+   updateProcessing(5,window.currentLanguage==='ar'?'جارٍ إرسال الصورة إلى خدمة المعالجة':'Sending image to background-removal service');
    const file=files[0];
+   let result=null,apiError=null;
    try{
-    if(!window.BgRemove)await loadScript('https://bgremovers.org/sdk/v1.js');
-    if(!window.BgRemove||typeof window.BgRemove.removeBackground!=='function')throw Error('The background-removal SDK did not load correctly.');
-    const result=await window.BgRemove.removeBackground(file,{
-     maxDimension:4096,
-     onProgress:(p)=>{
-      const stage=p?.stage||'';
-      const raw=Number(p?.progress);
-      const pct=Number.isFinite(raw)?Math.max(0,Math.min(100,raw<=1?raw*100:raw)):0;
-      if(stage==='loading-runtime')updateProcessing(Math.max(8,Math.min(25,8+pct*.17)),window.currentLanguage==='ar'?'جارٍ تجهيز محرك الذكاء الاصطناعي':'Preparing the AI runtime');
-      else if(stage==='loading-model')updateProcessing(Math.max(25,Math.min(72,25+pct*.47)),window.currentLanguage==='ar'?'جارٍ تحميل نموذج الذكاء الاصطناعي':'Loading the AI model');
-      else if(stage==='downloading')updateProcessing(Math.max(25,Math.min(72,25+pct*.47)),window.currentLanguage==='ar'?'جارٍ تنزيل النموذج':'Downloading the model');
-      else if(stage==='ready')updateProcessing(85,window.currentLanguage==='ar'?'جارٍ إزالة الخلفية':'Removing the background');
-      else updateProcessing(Math.max(8,Math.min(80,8+pct*.72)),window.currentLanguage==='ar'?'جارٍ معالجة الصورة على جهازك':'Processing the image on your device');
-     }
-    });
-    if(!result||!result.size)throw Error('The background-removal engine returned an empty image.');
+    if(file.size>10*1024*1024)throw Error(window.currentLanguage==='ar'?'حجم الصورة أكبر من 10 ميجابايت؛ جرّب صورة أصغر.':'Image is larger than 10 MB; please try a smaller image.');
+    const form=new FormData();form.append('image',file,file.name||'image');
+    updateProcessing(15,window.currentLanguage==='ar'?'جارٍ معالجة الصورة على السيرفر':'Processing image on the server');
+    const response=await fetch('https://bgremovers.org/api/v1/remove-background',{method:'POST',body:form});
+    if(!response.ok){
+     let detail='HTTP '+response.status;
+     try{const data=await response.json();detail=data?.error?.message||data?.error?.code||detail}catch{}
+     throw Error(detail);
+    }
+    result=await response.blob();
+    if(!result||!result.size)throw Error('The external service returned an empty image.');
     updateProcessing(98,window.currentLanguage==='ar'?'اكتملت إزالة الخلفية':'Background removed');
-    saveBlob(result,'background-removed.png');
-   }catch(sdkError){
-    const detail=sdkError?.message||'Unknown error';
-    throw Error((window.currentLanguage==='ar'?'تعذّرت إزالة الخلفية داخل المتصفح. تأكد من اتصال الإنترنت ثم جرّب صورة أصغر. ':'Could not remove the background in your browser. Check your internet connection and try a smaller image. ')+detail);
+   }catch(error){
+    apiError=error;
+    updateProcessing(25,window.currentLanguage==='ar'?'الخدمة الخارجية غير متاحة؛ سنجرّب المعالجة على جهازك':'External service unavailable; trying local processing');
+    try{
+     if(!window.BgRemove)await loadScript('https://bgremovers.org/sdk/v1.js');
+     if(!window.BgRemove||typeof window.BgRemove.removeBackground!=='function')throw Error('The local background-removal SDK did not load.');
+     result=await window.BgRemove.removeBackground(file,{maxDimension:4096,onProgress:(p)=>{
+      const stage=p?.stage||'',raw=Number(p?.progress),pct=Number.isFinite(raw)?Math.max(0,Math.min(100,raw<=1?raw*100:raw)):0;
+      if(stage==='loading-runtime')updateProcessing(Math.max(28,Math.min(45,28+pct*.17)),window.currentLanguage==='ar'?'جارٍ تجهيز المحرك على جهازك':'Preparing the local AI runtime');
+      else if(stage==='loading-model'||stage==='downloading')updateProcessing(Math.max(45,Math.min(82,45+pct*.37),window.currentLanguage==='ar'?'جارٍ تحميل نموذج الذكاء الاصطناعي':'Loading the AI model');
+      else if(stage==='ready')updateProcessing(88,window.currentLanguage==='ar'?'جارٍ إزالة الخلفية على جهازك':'Removing background on your device');
+      else updateProcessing(Math.max(28,Math.min(85,28+pct*.57)),window.currentLanguage==='ar'?'جارٍ معالجة الصورة على جهازك':'Processing on your device');
+     }});
+    }catch(localError){
+     const apiDetail=apiError?.message||'unknown error';
+     throw Error((window.currentLanguage==='ar'?'فشل السيرفر الخارجي والمعالجة المحلية. خطأ السيرفر: ':'Both server and local processing failed. Server error: ')+apiDetail+'; '+(localError?.message||'local processing failed'));
+    }
    }
+   if(!result||!result.size)throw Error('The background-removal service returned an empty image.');
+   saveBlob(result,'background-removed.png');
   }else if(tool.startsWith('image-')){
    const file=files[0],img=await imageFromFile(file),canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
    if(tool==='image-resize'){canvas.width=Math.max(1,Number($('imageWidth').value)||1200);canvas.height=Math.max(1,Number($('imageHeight').value)||1200)}

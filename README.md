@@ -1,28 +1,25 @@
 # Tempora
 
-A responsive single-page temporary email inbox prototype.
+Tempora is a responsive browser-based temporary email inbox with a growing collection of PDF and image tools.
 
 ## Features
-- Generate a temporary email address using the Mail.tm API
-- Copy the address
-- Inbox refresh button and automatic refresh every 15 seconds
-- Open messages and highlight a possible 4–8 digit verification code
-- Dark/light theme toggle
-- Privacy and terms information
+- Generate a temporary email inbox using the configured email provider
+- Copy the address, refresh messages, open messages, and copy a possible verification code
+- Merge PDF files and split a PDF into separate page files
+- Rotate PDF pages and convert PDF pages to JPG
+- Convert JPG/PNG images to PDF
+- Convert, resize, and compress images in the browser
 - Responsive layout for desktop and mobile
-- Clear the current inbox session from the page
 
 ## Run locally
 Open `index.html` in a browser, preferably through a local static server, or deploy it to a static host over HTTPS.
 
-## Important limitations
-- This is a prototype, not a production-ready privacy service.
-- Email accounts and messages are managed by Mail.tm. Provider availability, retention, delivery, and disposable-address acceptance are not guaranteed.
-- Review Mail.tm's current API terms and required attribution before publishing or monetizing this project.
-- Temporary SMS is only a clearly marked placeholder and is not connected.
-- The ad area is a placeholder; no advertising network is integrated.
+## Tool limitations
+- Supported PDF and image operations run in the browser and load processing libraries from public CDNs.
+- AI background removal, PDF-to-Word, Word-to-PDF, OCR, PDF compression, and advanced PDF editing are shown as coming soon and are not active.
+- Do not upload sensitive files to a service unless you trust its processing and privacy practices.
+- Email accounts and messages are managed by the configured email provider. Delivery, retention, and disposable-address acceptance are not guaranteed.
 - Do not use temporary inboxes for banking, sensitive accounts, or important recovery messages.
-- This front-end has no custom backend, user accounts, or server-side data store.
 
 ## Provider
-Mail.tm API: https://api.mail.tm
+Email provider API: `https://mailboxtemp.com/api`

@@ -59,7 +59,7 @@
 <div id="videoSection" hidden>
 <section class="panel">
  <div class="inbox-head"><h2>All Video Downloader</h2><span class="timer">PUBLIC LINKS</span></div>
- <p class="hint" style="margin:0 0 14px">Paste a direct media-file link or a supported service link. Tempora is free and blocks known adult domains. Direct file links can be opened for download; streaming services may require their official offline-download feature.</p>
+ <p class="hint" style="margin:0 0 14px">Paste a direct media-file link or a supported service link. Direct files can be opened here. For YouTube and streaming platforms, Tempora shows the official service link when it cannot provide a permitted direct download.</p>
  <label for="videoUrl" class="small">Video or post URL</label>
  <input id="videoUrl" type="url" placeholder="https://..." autocomplete="url" style="display:block;width:100%;margin:6px 0 12px;padding:12px;border:1px solid var(--line);border-radius:9px;background:white;color:var(--text)">
  <button id="videoDownloadBtn" class="primary" type="button">Find downloadable media</button>
@@ -183,7 +183,7 @@ async function downloadVideo(){
    const a=document.createElement('a');a.href=data.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Open / download file';a.style.cssText='color:var(--accent);font-weight:700';
    row.append(label,a);out.append(row);
   } else if(data.type==='official-service'){
-   const a=document.createElement('a');a.href=data.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Open official service';a.style.cssText='color:var(--accent);font-weight:700';out.append(a);
+   const a=document.createElement('a');a.href=data.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Open '+(data.service||'official service');a.style.cssText='color:var(--accent);font-weight:700';out.append(a);
   } else if(data.type==='unsupported'){throw Error(data.message||'This link cannot be downloaded directly by the free version.')}
  }catch(e){err.textContent=e.message||'Could not process this link.';err.hidden=false}
  finally{btn.disabled=false;btn.textContent='Check link'}

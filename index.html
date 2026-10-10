@@ -40,15 +40,15 @@
  <button id="generateCardBtn" class="primary" type="button">Generate demo card</button>
  <div id="demoCardResult" hidden style="margin-top:18px;border:1px solid var(--line);border-radius:14px;padding:18px;background:linear-gradient(135deg,#f7f8ff,#eef2ff)">
   <div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><strong id="demoCardNetwork">VISA</strong><span class="small">TEMPORA · DEMO</span></div>
-  <div style="font-size:21px;font-weight:800;letter-spacing:2px;margin:24px 0 12px">•••• •••• •••• <span id="demoCardLast4">0000</span></div>
+  <div id="demoCardNumber" style="font-size:21px;font-weight:800;letter-spacing:2px;margin:24px 0 12px;overflow-wrap:anywhere">4242 4242 4242 4242</div>
   <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:12px">
    <div><div class="small">CARDHOLDER</div><strong id="demoCardHolder">TEMPORA DEMO</strong></div>
    <div><div class="small">EXPIRES</div><strong id="demoCardExpiry">12/34</strong></div>
-   <div><div class="small">CVV / CVC</div><strong id="demoCardCvv">•••</strong></div>
+   <div><div class="small">CVV / CVC</div><strong id="demoCardCvv">123</strong></div>
    <div><div class="small">COUNTRY</div><strong id="demoCardCountry">Egypt</strong></div>
   </div>
   <div style="margin-top:12px"><div class="small">STATUS</div><strong>TEST DISPLAY ONLY — NOT A REAL PAYMENT CARD</strong></div>
-  <p class="hint">These are placeholder display values only. No issued card or payment credentials exist, and they cannot be used for real purchases, free trials, or payment verification.</p>
+  <p class="hint"><strong>TEST DATA ONLY.</strong> These sandbox numbers are for payment-provider test mode only. They are not issued cards and will not work for real purchases, live free trials, or payment verification.</p>
  </div>
 </section>
 <section class="panel">
@@ -138,13 +138,14 @@ async function copy(s){try{await navigator.clipboard.writeText(s);toast('Copied'
 function reset(){if(timer)clearInterval(timer);timer=null;stopEmailTimer();token=null;account=null;active(false);$('email').value='';$('lastUpdated').textContent='No inbox yet';$('error').hidden=true;$('messages').innerHTML='<div class="empty"><strong>Your inbox is empty</strong>Your received emails will show up here.</div>';status('Ready when you are');toast('Ready for a new inbox')}
 function generateDemoCard(){
  const network=$('cardNetwork').value,country=$('cardCountry').value;
- const bytes=new Uint8Array(2);crypto.getRandomValues(bytes);
+ // Published test-mode card numbers only; never usable as live payment cards.
+ const testNumber=network==='Mastercard'?'5555 5555 5555 4444':'4242 4242 4242 4242';
  $('demoCardNetwork').textContent=network.toUpperCase();
  $('demoCardCountry').textContent=country;
  $('demoCardHolder').textContent='TEMPORA DEMO';
  $('demoCardExpiry').textContent='12/34';
- $('demoCardCvv').textContent='•••';
- $('demoCardLast4').textContent=String(1000+((bytes[0]*256+bytes[1])%9000));
+ $('demoCardCvv').textContent='123';
+ $('demoCardNumber').textContent=testNumber;
  $('demoCardResult').hidden=false;
 }
 $('generateCardBtn').onclick=generateDemoCard;

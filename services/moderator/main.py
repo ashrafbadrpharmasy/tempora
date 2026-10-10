@@ -103,7 +103,7 @@ async def scan_video(file: UploadFile = File(...)):
             else:
                 verdict = "review_required"
                 text_findings.append("Automated screening cannot certify a video as 100% safe; human review is required.")
-            return ScanResponse(verdict=verdict,complete=True,frames_checked=len(frames),duration_seconds=round(duration,2),reasons=visual,text_findings=sorted(set(text_findings)),note="Sampling and classifiers can miss content. This does not verify a person's age and is not a guarantee.")
+            return ScanResponse(verdict=verdict,complete=False,frames_checked=len(frames),duration_seconds=round(duration,2),reasons=visual,text_findings=sorted(set(text_findings)),note="Sampling and classifiers can miss content. This does not verify a person's age and is not a guarantee.")
         except HTTPException: raise
         except Exception as exc:
             raise HTTPException(503,f"Safety scan failed; treat video as unreviewed. {str(exc)[:250]}") from exc

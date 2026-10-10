@@ -373,6 +373,7 @@ function applyLanguage(lang){
  const actionKeys={'merge-pdf':'chooseFiles','split-pdf':'chooseFile','compress-pdf':'chooseFile','pdf-to-jpg':'chooseFile','jpg-to-pdf':'chooseImages','pdf-to-word':'openTool','word-to-pdf':'openTool','rotate-pdf':'chooseFile','edit-pdf':'openTool','image-convert':'chooseImage','image-resize':'chooseImage','image-compress':'chooseImage','remove-bg':'openTool','ocr-pdf':'openTool','qr-generator':'openTool','image-crop':'chooseImage','image-text':'chooseImage','percentage':'openTool'};
  document.querySelectorAll('.tool-card').forEach(card=>{const action=card.querySelector('.tool-card-link');const key=actionKeys[card.dataset.tool];if(action&&key){const label=action.querySelector('[data-i18n]');if(label)label.textContent=t[key];else if(action.firstChild&&action.firstChild.nodeType===3)action.firstChild.textContent=t[key]+' '}});
  if(window.currentTool&&$('toolWorkspace')&&!$('toolWorkspace').hidden)renderToolOptions();
+ if(document.querySelector('#toolsSection .tool-group')){const labels=lang==='ar'?{pdf:['أدوات PDF','دمج الملفات وتحويلها وتعديلها'],image:['أدوات الصور','قص الصور وتغيير حجمها واستخراج النص'],generator:['أدوات الإنشاء','أنشئ رموزًا وملفات مفيدة'],calculator:['الحاسبات','حسابات سريعة بدون تعقيد']}:{pdf:['PDF tools','Merge, convert, compress, and edit documents'],image:['Image tools','Crop, resize, convert, and extract text'],generator:['Generators','Create useful assets in seconds'],calculator:['Calculators','Quick calculations without the hassle']};document.querySelectorAll('#toolsSection .tool-group').forEach(g=>{const pair=labels[g.dataset.groupCategory];if(pair){g.querySelector('h2').textContent=pair[0];g.querySelector('p').textContent=pair[1];}})}
 }
 $('languageToggle').onclick=()=>applyLanguage(window.currentLanguage==='en'?'ar':'en');
 $('emailTab').onclick=()=>showTool('email');$('toolsTab').onclick=()=>showTool('tools');
@@ -384,12 +385,12 @@ function filterToolCards(){
 $('toolSearch').oninput=filterToolCards;
 document.querySelectorAll('.tool-card').forEach(card=>card.onclick=()=>{
  const tool=card.dataset.tool;window.currentTool=tool;
- $('toolGrid').closest('.tool-group').hidden=true;$('toolWorkspace').hidden=false;
+ document.querySelectorAll('#toolsSection .tool-group').forEach(g=>g.hidden=true);$('toolWorkspace').hidden=false;
  $('toolFiles').value='';$('toolResult').innerHTML='';renderToolOptions();
  $('toolWorkspace').scrollIntoView({behavior:'smooth',block:'start'});
 });
-$('backToTools').onclick=()=>{$('toolWorkspace').hidden=true;$('toolGrid').closest('.tool-group').hidden=false;$('toolFiles').value='';$('toolError').hidden=true;$('toolResult').innerHTML='';};
-$('runToolBtn').onclick=runTool;window.currentTool='merge-pdf';renderToolOptions();filterToolCards();
+$('backToTools').onclick=()=>{$('toolWorkspace').hidden=true;filterToolCards();$('toolFiles').value='';$('toolError').hidden=true;$('toolResult').innerHTML='';};
+$('runToolBtn').onclick=runTool;window.currentTool='merge-pdf';renderToolOptions();organizeToolGroups();filterToolCards();
 
 $('createBtn').onclick=generate;$('refreshBtn').onclick=refresh;$('extendTimerBtn').onclick=extendEmailTimer;$('copyBtn').onclick=()=>copy($('email').value);$('deleteBtn').onclick=reset;$('closeModal').onclick=()=>$('modal').classList.remove('open');$('modal').onclick=e=>{if(e.target===$('modal'))$('modal').classList.remove('open')};
 </script></body></html>

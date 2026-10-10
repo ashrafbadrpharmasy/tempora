@@ -269,10 +269,10 @@ async function runTool(){
    const worker=await window.Tesseract.createWorker($('ocrLanguage').value);let textValue='';try{textValue=(await worker.recognize(files[0])).data.text}finally{await worker.terminate()}
    const area=document.createElement('textarea');area.value=textValue;area.rows=10;area.style.cssText='display:block;width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;margin-top:12px;font:inherit';out.append(area);
    const cp=document.createElement('button');cp.textContent='Copy text';cp.onclick=()=>navigator.clipboard.writeText(area.value);out.append(cp);
-   const dl=document.createElement('button');dl.style.marginInlineStart='8px';dl.textContent='Download TXT';dl.onclick=()=>saveBlob(new Blob([area.value],{type:'text/plain;charset=utf-8'}),'extracted-text.txt');out.append(dl);
+   const dl=document.createElement('button');dl.style.marginInlineStart='8px';dl.textContent='Download TXT';dl.onclick=()=>downloadBlob(new Blob([area.value],{type:'text/plain;charset=utf-8'}),'extracted-text.txt');out.append(dl);
   }else if(tool==='image-crop'){
    const im=await imageFromFile(files[0]),x=Math.max(0,Number($('cropX').value)||0),y=Math.max(0,Number($('cropY').value)||0);let w=Math.max(1,Number($('cropW').value)||im.naturalWidth),h=Math.max(1,Number($('cropH').value)||im.naturalHeight);const ratios={'1:1':1,'4:5':.8,'16:9':16/9,'3:2':1.5},ratio=$('cropRatio').value;if(ratios[ratio])h=Math.round(w/ratios[ratio]);w=Math.min(w,im.naturalWidth-x);h=Math.min(h,im.naturalHeight-y);if(x>=im.naturalWidth||y>=im.naturalHeight||w<1||h<1)throw Error('Crop area is outside the image.');
-   const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(im,x,y,w,h,0,0,w,h);out.append(canvas);const blob=await new Promise(r=>canvas.toBlob(r,'image/png'));const dl=document.createElement('button');dl.className='primary';dl.textContent='Download cropped image';dl.onclick=()=>saveBlob(blob,'tempora-cropped.png');out.append(dl);
+   const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(im,x,y,w,h,0,0,w,h);out.append(canvas);const blob=await new Promise(r=>canvas.toBlob(r,'image/png'));const dl=document.createElement('button');dl.className='primary';dl.textContent='Download cropped image';dl.onclick=()=>downloadBlob(blob,'tempora-cropped.png');out.append(dl);
   }else if(tool==='merge-pdf'){
    if(files.length<2)throw Error('Choose at least two PDF files to merge.');
    const merged=await PDFDocument.create();
@@ -326,7 +326,7 @@ async function runTool(){
    const file=files[0],arrayBuffer=await file.arrayBuffer(),result=await window.mammoth.convertToHtml({arrayBuffer});
    const wrapper=document.createElement('div');wrapper.style.cssText='font-family:Arial,sans-serif;color:#111;background:white;width:700px;padding:28px;font-size:12pt;line-height:1.5';wrapper.innerHTML=result.value;
    document.body.append(wrapper);
-   try{await window.html2pdf().set({margin:10,filename:'converted.pdf',image:{type:'jpeg',quality:0.95},html2canvas:{scale:1.5,useCORS:true},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}}).from(wrapper).save()}finally{wrapper.remove()}
+   try{const pdfBlob=await window.html2pdf().set({margin:10,image:{type:'jpeg',quality:0.95},html2canvas:{scale:1.5,useCORS:true},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}}).from(wrapper).outputPdf('blob');saveBlob(pdfBlob,'converted.pdf')}finally{wrapper.remove()}
   }else if(tool==='ocr-pdf'){
    const pdfjs=await getPdfJs();await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js');
    const pdf=await pdfjs.getDocument({data:await files[0].arrayBuffer()}).promise,worker=await window.Tesseract.createWorker('eng');let fullText='';

@@ -361,7 +361,7 @@ async function runTool(){
      result=await window.BgRemove.removeBackground(file,{maxDimension:4096,onProgress:(p)=>{
       const stage=p?.stage||'',raw=Number(p?.progress),pct=Number.isFinite(raw)?Math.max(0,Math.min(100,raw<=1?raw*100:raw)):0;
       if(stage==='loading-runtime')updateProcessing(Math.max(28,Math.min(45,28+pct*.17)),window.currentLanguage==='ar'?'جارٍ تجهيز المحرك على جهازك':'Preparing the local AI runtime');
-      else if(stage==='loading-model'||stage==='downloading')updateProcessing(Math.max(45,Math.min(82,45+pct*.37),window.currentLanguage==='ar'?'جارٍ تحميل نموذج الذكاء الاصطناعي':'Loading the AI model');
+      else if(stage==='loading-model'||stage==='downloading')updateProcessing(Math.max(45,Math.min(82,45+pct*.37)),window.currentLanguage==='ar'?'جارٍ تحميل نموذج الذكاء الاصطناعي':'Loading the AI model');
       else if(stage==='ready')updateProcessing(88,window.currentLanguage==='ar'?'جارٍ إزالة الخلفية على جهازك':'Removing background on your device');
       else updateProcessing(Math.max(28,Math.min(85,28+pct*.57)),window.currentLanguage==='ar'?'جارٍ معالجة الصورة على جهازك':'Processing on your device');
      }});

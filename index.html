@@ -286,8 +286,16 @@ async function runInpaintTool(){
  btn.disabled=true;btn.textContent=ar?'جارٍ تجهيز الممحاة…':'Preparing eraser…';
  try{
   if(!window.cv||!window.cv.Mat){await loadScript('https://docs.opencv.org/4.x/opencv.js');await new Promise((resolve,reject)=>{if(window.cv&&window.cv.Mat){resolve();return}const start=Date.now(),t=setInterval(()=>{if(window.cv&&window.cv.Mat){clearInterval(t);resolve()}else if(Date.now()-start>90000){clearInterval(t);reject(Error('Image engine timed out.'))}},100)})}
-  btn.textContent=ar?'جارٍ إزالة المنطقة…':'Removing selected area…';const cv=window.cv,src=cv.imread(window.inpaintBaseCanvas),mask=cv.imread(window.inpaintMaskCanvas),dst=new cv.Mat(),gray=new cv.Mat();
-  try{cv.cvtColor(mask,gray,cv.COLOR_RGBA2GRAY);cv.threshold(gray,gray,1,255,cv.THRESH_BINARY);cv.inpaint(src,gray,dst,3,cv.INPAINT_TELEA);const c=document.createElement('canvas');c.width=dst.cols;c.height=dst.rows;cv.imshow(c,dst);const blob=await new Promise(resolve=>c.toBlob(resolve,'image/png'));if(!blob)throw Error('Could not create result image.');saveBlob(blob,'tempora-'+(window.currentTool==='watermark-remover'?'watermark-removed':'magic-eraser')+'.png');out.scrollIntoView({behavior:'smooth',block:'nearest'})}finally{src.delete();mask.delete();dst.delete();gray.delete()}
+  btn.textContent=ar?'جارٍ إزالة المنطقة…':'Removing selected area…';const cv=window.cv,srcRgba=cv.imread(window.inpaintBaseCanvas),maskRgba=cv.imread(window.inpaintMaskCanvas),srcRgb=new cv.Mat(),mask=new cv.Mat(maskRgba.rows,maskRgba.cols,cv.CV_8UC1),dstRgb=new cv.Mat(),dstRgba=new cv.Mat();
+  try{
+   cv.cvtColor(srcRgba,srcRgb,cv.COLOR_RGBA2RGB);
+   for(let y=0;y<maskRgba.rows;y++){for(let x=0;x<maskRgba.cols;x++){const alpha=maskRgba.ucharPtr(y,x)[3];mask.ucharPtr(y,x)[0]=alpha>0?255:0}}
+   cv.inpaint(srcRgb,mask,dstRgb,3,cv.INPAINT_TELEA);
+   cv.cvtColor(dstRgb,dstRgba,cv.COLOR_RGB2RGBA);
+   const c=document.createElement('canvas');c.width=dstRgba.cols;c.height=dstRgba.rows;cv.imshow(c,dstRgba);
+   const blob=await new Promise(resolve=>c.toBlob(resolve,'image/png'));if(!blob)throw Error('Could not create result image.');
+   saveBlob(blob,'tempora-'+(window.currentTool==='watermark-remover'?'watermark-removed':'magic-eraser')+'.png');out.scrollIntoView({behavior:'smooth',block:'nearest'})
+  }finally{srcRgba.delete();maskRgba.delete();srcRgb.delete();mask.delete();dstRgb.delete();dstRgba.delete()}
  }catch(e){err.textContent=(ar?'تعذرت المعالجة: ':'Could not process image: ')+(e?.message||e);err.hidden=false}
  finally{btn.disabled=false;btn.textContent=ar?'إزالة المنطقة المحددة':'Remove selected area'}
 }

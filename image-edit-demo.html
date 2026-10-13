@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f7f8fa">
+<title>Image to Editable Design — Tempora Demo</title>
+<style>
+:root{--bg:#f7f8fa;--card:#fff;--ink:#20242c;--muted:#667085;--line:#e4e7ec;--blue:#315efb;--soft:#eef2ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,-apple-system,Segoe UI,sans-serif}button,input,select{font:inherit}button{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:10px;padding:10px 13px;font-weight:650;cursor:pointer}button:hover{border-color:#9aabff}button:disabled{opacity:.5;cursor:not-allowed}.primary{background:var(--blue);color:#fff;border-color:var(--blue)}header{padding:22px max(18px,calc((100vw - 1180px)/2));background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:16px}header a{color:var(--blue);text-decoration:none;font-weight:700}.brand{font-weight:850;font-size:19px;letter-spacing:-.5px}.brand span{color:var(--blue)}main{max-width:1180px;margin:30px auto;padding:0 18px}.intro{margin-bottom:22px}.eyebrow{color:var(--blue);font-weight:800;text-transform:uppercase;font-size:11px;letter-spacing:1.2px}.intro h1{font-size:clamp(27px,4vw,40px);line-height:1.1;letter-spacing:-1.3px;margin:7px 0 10px}.intro p{color:var(--muted);max-width:720px;margin:0}.layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(290px,.8fr);gap:18px;align-items:start}.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}.panel-head{padding:15px 17px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}.panel-head strong{font-size:15px}.canvas-wrap{background:#eef0f4;min-height:320px;display:flex;align-items:center;justify-content:center;padding:14px;overflow:auto}.canvas-wrap canvas{max-width:100%;height:auto;box-shadow:0 3px 16px #1822301a;cursor:crosshair;background:white}.empty{padding:55px 20px;text-align:center;color:var(--muted);max-width:440px}.empty .big{font-size:36px;margin-bottom:8px}.controls{padding:16px;display:grid;gap:13px}.field{display:grid;gap:5px}.field label{font-size:12px;color:var(--muted);font-weight:750}.field input,.field select{width:100%;min-width:0;border:1px solid var(--line);border-radius:9px;padding:10px;background:white;color:var(--ink)}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.actions{display:flex;flex-wrap:wrap;gap:8px}.note{background:#f4f6ff;color:#34426e;padding:11px 12px;border-radius:10px;font-size:12px}.status{color:var(--muted);font-size:12px;min-height:18px}.detected{display:grid;gap:7px;max-height:220px;overflow:auto}.lineitem{display:flex;align-items:flex-start;gap:8px;text-align:left;width:100%;font-weight:500;font-size:12px;line-height:1.35;padding:9px}.lineitem.active{border-color:var(--blue);background:var(--soft)}.lineitem small{display:block;color:var(--muted);margin-top:3px}.pill{font-size:11px;background:#f0f2f5;padding:3px 7px;border-radius:20px;color:#525866;white-space:nowrap}.foot{font-size:12px;color:var(--muted);margin:18px 0 35px}.hidden{display:none!important}@media(max-width:780px){.layout{grid-template-columns:1fr}.canvas-wrap{min-height:240px}header{padding:16px 18px}}
+</style>
+</head>
+<body>
+<header><div class="brand">tempora<span>.</span></div><a href="/">← Back to Tempora</a></header>
+<main>
+<section class="intro"><div class="eyebrow">Free experimental tool</div><h1>Image to Editable Design</h1><p>Try changing words inside a flat image. The demo detects text, lets you replace it, and rebuilds the selected area approximately — right in your browser.</p></section>
+<div class="layout">
+<section class="panel">
+<div class="panel-head"><strong>Image preview</strong><span class="pill" id="imageState">No image yet</span></div>
+<div class="canvas-wrap" id="canvasWrap"><div class="empty" id="empty"><div class="big">▧</div><strong>Upload a poster, flyer, or design</strong><p>Then run text detection. For best results, use a clear image with readable text.</p><button class="primary" id="uploadBtn" style="margin-top:12px">Choose image</button></div><canvas id="canvas" class="hidden"></canvas></div>
+<div class="controls">
+<div class="actions"><button id="detectBtn" class="primary" disabled>Detect text (free)</button><button id="manualBtn" disabled>Draw text area manually</button><button id="resetBtn" disabled>Reset image</button></div>
+<div class="status" id="status">Your image stays in this browser; OCR runs on-device after its library loads.</div>
+<div class="note">Demo limitation: this uses OCR plus approximate background filling, not generative AI. Complex textures, gradients, or text over photos may not restore cleanly. The downloaded result is a PNG, not a layered Canva project.</div>
+</div>
+</section>
+<aside class="panel">
+<div class="panel-head"><strong>Text editor</strong><span class="pill" id="count">0 detected</span></div>
+<div class="controls">
+<div class="field"><label>Detected text — tap a line to edit it</label><div class="detected" id="detected"><span class="status">Upload an image, then detect text.</span></div></div>
+<div class="field"><label for="newText">Replacement text</label><input id="newText" placeholder="Select a text line first" disabled></div>
+<div class="row"><div class="field"><label for="font">Font</label><select id="font" disabled><option>Arial</option><option>Tahoma</option><option>Georgia</option><option>Impact</option><option>Verdana</option><option>Times New Roman</option></select></div><div class="field"><label for="size">Font size (px)</label><input id="size" type="number" min="6" max="200" value="28" disabled></div></div>
+<div class="row"><div class="field"><label for="color">Text color</label><input id="color" type="color" value="#202020" disabled></div><div class="field"><label for="fill">Background patch</label><input id="fill" type="color" value="#ffffff" disabled></div></div>
+<div class="actions"><button id="applyBtn" class="primary" disabled>Replace selected text</button><button id="undoBtn" disabled>Undo last change</button></div>
+<div class="actions"><button id="downloadBtn" disabled>Download PNG</button></div>
+<div class="status" id="hint">The original font and background cannot always be recovered from a flattened image.</div>
+</div>
+</aside>
+</div>
+<p class="foot">Tempora prototype · Free to try · No account required. OCR uses the open-source Tesseract.js library loaded from a CDN; the first load needs an internet connection.</p>
+<input type="file" id="file" accept="image/*" class="hidden">
+</main>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script>
+(()=> {
+const $=id=>document.getElementById(id);
+const canvas=$('canvas'),ctx=canvas.getContext('2d',{willReadFrequently:true});
+let original=null, selected=null, lines=[], undoStack=[], manual=false, dragStart=null, previewImage=null;
+const fields=['newText','font','size','color','fill'];
+function say(t){$('status').textContent=t}
+function setFields(on){fields.forEach(id=>$(id).disabled=!on);$('applyBtn').disabled=!on;$('undoBtn').disabled=!undoStack.length}
+function snapshot(){undoStack.push(ctx.getImageData(0,0,canvas.width,canvas.height));if(undoStack.length>10)undoStack.shift();$('undoBtn').disabled=false}
+function drawBase(){if(!original)return;ctx.putImageData(original,0,0);lines.forEach((l,i)=>{ctx.save();ctx.strokeStyle=i===selected?'#315efb':'rgba(49,94,251,.65)';ctx.lineWidth=Math.max(2,canvas.width/500);ctx.setLineDash(i===selected?[]:[5,4]);ctx.strokeRect(l.x,l.y,l.w,l.h);ctx.restore()})}
+function showLines(){const host=$('detected');host.innerHTML='';if(!lines.length){host.innerHTML='<span class="status">No text detected yet. You can draw an area manually.</span>';return}lines.forEach((l,i)=>{const b=document.createElement('button');b.className='lineitem'+(i===selected?' active':'');b.innerHTML='<span style="flex:1;overflow-wrap:anywhere"></span><small></small>';b.children[0].textContent=l.text||'Selected area';b.children[1].textContent=Math.round(l.conf||0)+'% confidence';b.onclick=()=>selectLine(i);host.appendChild(b)})}
+function selectLine(i){selected=i;const l=lines[i];$('newText').value=l.text||'';$('size').value=Math.max(8,Math.round(l.h*.78));$('color').value='#202020';$('fill').value=sampleColor(l);setFields(true);drawBase();showLines();$('hint').textContent='Detected box: '+l.w+' × '+l.h+' px. Check the preview and adjust the background patch color before applying.'}
+function sampleColor(l){const x=Math.max(0,Math.min(canvas.width-1,Math.round(l.x+l.w/2))), y=Math.max(0,Math.min(canvas.height-1,Math.round(l.y+l.h+Math.max(1,l.h*.25))));try{const d=ctx.getImageData(x,y,1,1).data;return '#'+[d[0],d[1],d[2]].map(v=>v.toString(16).padStart(2,'0')).join('')}catch(e){return '#ffffff'}}
+function loadImage(file){if(!file||!file.type.startsWith('image/'))return;const img=new Image();img.onload=()=>{const max=2200,scale=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));canvas.width=Math.round(img.naturalWidth*scale);canvas.height=Math.round(img.naturalHeight*scale);ctx.drawImage(img,0,0,canvas.width,canvas.height);original=ctx.getImageData(0,0,canvas.width,canvas.height);lines=[];selected=null;undoStack=[];canvas.classList.remove('hidden');$('empty').classList.add('hidden');$('imageState').textContent=canvas.width+' × '+canvas.height;$('count').textContent='0 detected';$('detectBtn').disabled=false;$('manualBtn').disabled=false;$('resetBtn').disabled=false;$('downloadBtn').disabled=false;setFields(false);showLines();say('Image loaded. Tap Detect text to find words.');URL.revokeObjectURL(img.src)};img.src=URL.createObjectURL(file)}
+$('uploadBtn').onclick=()=>$('file').click();$('file').onchange=e=>loadImage(e.target.files[0]);
+$('detectBtn').onclick=async()=>{if(!window.Tesseract){say('OCR library is still loading. Check your connection and try again.');return}$('detectBtn').disabled=true;say('Detecting text… the first run may take a little while.');try{const result=await Tesseract.recognize(canvas.toDataURL('image/png'),'eng+ara',{logger:m=>{if(m.status&&m.progress)say(m.status+' '+Math.round(m.progress*100)+'%')}});const raw=result.data.lines||[];lines=raw.filter(l=>l.text&&l.text.trim()&&l.confidence>15).map(l=>({x:Math.max(0,l.bbox.x0),y:Math.max(0,l.bbox.y0),w:Math.min(canvas.width-l.bbox.x0,l.bbox.x1-l.bbox.x0),h:Math.min(canvas.height-l.bbox.y0,l.bbox.y1-l.bbox.y0),text:l.text.trim(),conf:l.confidence})).filter(l=>l.w>2&&l.h>2);selected=lines.length?0:null;if(original)ctx.putImageData(original,0,0);showLines();$('count').textContent=lines.length+' detected';if(selected!==null)selectLine(selected);say(lines.length?'Found '+lines.length+' text lines. Select one and replace its wording.':'No clear text found. Try a sharper image or draw an area manually.')}catch(e){say('Text detection failed. Try again with a smaller or clearer image.')}finally{$('detectBtn').disabled=false}};
+$('manualBtn').onclick=()=>{manual=true;canvas.style.cursor='crosshair';say('Drag across the text area in the image to create a manual selection.');};
+canvas.addEventListener('pointerdown',e=>{if(!manual)return;const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.height;dragStart={x,y};canvas.setPointerCapture(e.pointerId)});
+canvas.addEventListener('pointerup',e=>{if(!manual||!dragStart)return;const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.height;const a=dragStart;manual=false;dragStart=null;canvas.style.cursor='crosshair';const l={x:Math.round(Math.min(a.x,x)),y:Math.round(Math.min(a.y,y)),w:Math.round(Math.abs(x-a.x)),h:Math.round(Math.abs(y-a.y)),text:'',conf:100};if(l.w<5||l.h<5){say('Selection too small; drag a larger rectangle.');return}lines.push(l);$('count').textContent=lines.length+' detected';selectLine(lines.length-1);showLines();say('Manual area selected. Type the replacement text.')});
+$('applyBtn').onclick=()=>{if(selected===null||!lines[selected])return;const l=lines[selected],text=$('newText').value.trim();if(!text){say('Enter the replacement text first.');return}snapshot();const fill=$('fill').value;ctx.save();ctx.fillStyle=fill;const pad=Math.max(2,l.h*.12);ctx.fillRect(Math.max(0,l.x-pad),Math.max(0,l.y-pad),Math.min(canvas.width-l.x+pad,l.w+pad*2),Math.min(canvas.height-l.y+pad,l.h+pad*2));const font=Math.max(6,Math.min(200,Number($('size').value)||l.h*.8));ctx.fillStyle=$('color').value;ctx.font='normal '+font+'px "'+$('font').value+'"';ctx.textBaseline='middle';ctx.textAlign='left';ctx.direction=/[\u0600-\u06FF]/.test(text)?'rtl':'ltr';const tx=ctx.direction==='rtl'?l.x+l.w:l.x;ctx.fillText(text,tx,l.y+l.h/2,Math.max(l.w*1.8,20));ctx.restore();l.text=text;original=ctx.getImageData(0,0,canvas.width,canvas.height);selected=null;setFields(false);drawBase();showLines();say('Replacement applied. You can select another line or download the image.');$('hint').textContent='Changes are baked into the image. Use Undo immediately if the result is not right.'};
+$('undoBtn').onclick=()=>{if(!undoStack.length)return;const d=undoStack.pop();ctx.putImageData(d,0,0);original=ctx.getImageData(0,0,canvas.width,canvas.height);$('undoBtn').disabled=!undoStack.length;say('Undid the last change.')};
+$('resetBtn').onclick=()=>{if(!original)return;ctx.putImageData(original,0,0);lines=[];selected=null;undoStack=[];setFields(false);showLines();$('count').textContent='0 detected';$('undoBtn').disabled=true;say('Current canvas reset to the image snapshot. Reload the original file to start fully over.')};
+$('downloadBtn').onclick=()=>canvas.toBlob(b=>{if(!b)return;const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='tempora-edited-image.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)},'image/png');
+})();
+</script>
+</body>
+</html>

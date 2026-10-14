@@ -13,12 +13,12 @@
 <body>
 <header><div class="brand">tempora<span>.</span></div><a href="index.html">← Back to Tempora</a></header>
 <main class="wrap">
-<section class="intro"><h1>Fake Chat Generator</h1><p>Create fictional chat screenshots for jokes, stories, and videos. Customize the profile, messages, and timestamps.</p></section>
+<section class="intro"><h1>Fake Chat Generator</h1><p>Create fictional chat mockups for films, stories, and creative projects. Customize the profile, messages, and timestamps. For educational and entertainment purposes only.</p></section>
 <div class="ad-slot" aria-label="Advertisement">Advertisement</div>
 <div class="layout">
 <section class="panel">
 <h2>Chat settings</h2>
-<div class="field"><label for="platform">Chat style</label><select id="platform"><option value="whatsapp">WhatsApp</option><option value="instagram">Instagram DM</option><option value="tiktok">TikTok messages</option></select></div>
+<div class="field"><label for="platform">Chat style</label><select id="platform"><option value="whatsapp">WhatsApp</option><option value="instagram">Instagram DM</option><option value="tiktok">TikTok messages</option><option value="snapchat">Snapchat chat</option></select></div>
 <div class="field"><label for="personName">Person's display name</label><input id="personName" value="Cristiano Ronaldo" maxlength="60"></div>
 <div class="field"><label for="status">Status line</label><input id="status" value="last seen recently" maxlength="70"></div>
 <div class="field"><label for="profilePhoto">Profile photo</label><div class="photo-row"><img id="avatarPreview" class="avatar" alt="Profile preview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23dbeafe'/%3E%3Ccircle cx='50' cy='37' r='20' fill='%236b86b6'/%3E%3Cpath d='M15 100c3-25 17-37 35-37s32 12 35 37' fill='%236b86b6'/%3E%3C/svg%3E"><input id="profilePhoto" type="file" accept="image/*"></div><p class="hint">Choose a photo you have permission to use.</p></div>
@@ -34,7 +34,7 @@
 <div class="preview-title"><h2>Live preview</h2><span class="hint">Updates automatically</span></div>
 <div id="chatFrame" class="chat-frame">
 <div class="chat-head"><img id="chatAvatar" class="avatar" alt="" src=""><div class="person"><strong id="chatName">Cristiano Ronaldo</strong><small id="chatStatus">last seen recently</small></div><span aria-hidden="true">⋮</span></div>
-<div id="chatBody" class="chat-body"></div><div class="fake-label" id="fakeLabel">FICTIONAL CHAT • MADE FOR ENTERTAINMENT</div>
+<div id="chatBody" class="chat-body"></div><div class="fake-label" id="fakeLabel">FICTIONAL CHAT • FOR EDUCATIONAL & ENTERTAINMENT PURPOSES ONLY</div>
 <div class="chat-input"><span>Message</span><b>➤</b></div>
 </div>
 <div class="export-row"><button class="primary" id="downloadPng" type="button">Download PNG</button><button id="downloadJpg" type="button">Download JPG</button></div>
@@ -70,7 +70,7 @@ function renderPreview(){
  const name=$('personName').value.trim()||'Chat contact';$('chatName').textContent=name;$('chatStatus').textContent=$('showStatus').checked?$('status').value:'';$('chatStatus').hidden=!$('showStatus').checked;
  $('avatarPreview').src=photoData;$('chatAvatar').src=photoData;
  const platform=$('platform').value;const head=$('chatFrame').querySelector('.chat-head');
- const colors={whatsapp:['#075e54','#efeae2','#d9fdd3','#fff'],instagram:['#7546a8','#f6f0fa','#e6d9ff','#fff'],tiktok:['#171717','#f2f2f2','#d7f8f5','#fff']};
+ const colors={whatsapp:['#075e54','#efeae2','#d9fdd3','#fff'],instagram:['#7546a8','#f6f0fa','#e6d9ff','#fff'],tiktok:['#171717','#f2f2f2','#d7f8f5','#fff'],snapchat:['#d9f000','#faf9f2','#e7f0a4','#fff']};
  const c=colors[platform];head.style.background=c[0];$('chatBody').style.backgroundColor=c[1];$('chatBody').style.backgroundImage=$('wallpaper').value==='plain'?'none':$('wallpaper').value==='dark'?'linear-gradient(#222,#222)':'radial-gradient(#d8d2c8 0.65px,transparent .65px)';$('chatBody').style.backgroundSize='13px 13px';$('chatBody').querySelectorAll('.bubble.me').forEach(b=>b.style.background=c[2]);$('chatBody').querySelectorAll('.bubble.them').forEach(b=>b.style.background=c[3]);
  $('fakeLabel').hidden=!$('fictionLabel').checked;
  const body=$('chatBody');body.innerHTML='';let lastDate='';
@@ -87,16 +87,16 @@ async function exportImage(type){
  messages.forEach(m=>{const words=String(m.text).split(/\s+/);let line='';let arr=[];for(const word of words){const test=line?line+' '+word:word;if(measure.measureText(test).width>lineMax&&line){arr.push(line);line=word}else line=test}arr.push(line);lines.push({m,lines:arr,h:arr.length*36+34})});
  let bodyH=65+lines.reduce((n,l)=>n+l.h+12,0)+22;let height=headerH+bodyH+bottomH+($('fictionLabel').checked?34:0);
  const canvas=document.createElement('canvas');canvas.width=width*scale;canvas.height=height*scale;const ctx=canvas.getContext('2d');ctx.scale(scale,scale);
- const colors={whatsapp:{head:'#075e54',bg:$('wallpaper').value==='dark'?'#252525':'#efeae2',me:'#d9fdd3',them:'#fff'},instagram:{head:'#7546a8',bg:'#f6f0fa',me:'#e6d9ff',them:'#fff'},tiktok:{head:'#171717',bg:'#f2f2f2',me:'#d7f8f5',them:'#fff'}}[platform];
+ const colors={whatsapp:{head:'#075e54',bg:$('wallpaper').value==='dark'?'#252525':'#efeae2',me:'#d9fdd3',them:'#fff'},instagram:{head:'#7546a8',bg:'#f6f0fa',me:'#e6d9ff',them:'#fff'},tiktok:{head:'#171717',bg:'#f2f2f2',me:'#d7f8f5',them:'#fff'},snapchat:{head:'#fffc00',bg:'#faf9f2',me:'#e7f0a4',them:'#fff'}}[platform];
  ctx.fillStyle=colors.bg;ctx.fillRect(0,0,width,height);ctx.fillStyle=colors.head;ctx.fillRect(0,0,width,headerH);
  try{const img=new Image();img.src=photoData;await new Promise((res,rej)=>{img.onload=res;img.onerror=rej});ctx.save();ctx.beginPath();ctx.arc(51,41,25,0,Math.PI*2);ctx.clip();ctx.drawImage(img,26,16,50,50);ctx.restore()}catch{}
- ctx.fillStyle='#fff';ctx.font='bold 24px Arial';ctx.fillText(name.slice(0,35),91,37);ctx.globalAlpha=.8;ctx.font='16px Arial';ctx.fillText($('showStatus').checked?$('status').value.slice(0,42):platform==='whatsapp'?'WhatsApp':platform==='instagram'?'Instagram':'TikTok',91,61);ctx.globalAlpha=1;
+ ctx.fillStyle='#fff';ctx.font='bold 24px Arial';ctx.fillText(name.slice(0,35),91,37);ctx.globalAlpha=.8;ctx.font='16px Arial';ctx.fillText($('showStatus').checked?$('status').value.slice(0,42):platform==='whatsapp'?'WhatsApp':platform==='instagram'?'Instagram':platform==='tiktok'?'TikTok':'Snapchat',91,61);ctx.globalAlpha=1;
  let y=headerH+23;let prev='';
  for(const item of lines){const m=item.m;if(m.date!==prev){const label=formatDate(m.date);ctx.font='15px Arial';const dw=measure.measureText(label).width+26;ctx.fillStyle='#fff';drawRounded(ctx,(width-dw)/2,y,dw,30,10);ctx.fillStyle='#5d6662';ctx.textAlign='center';ctx.fillText(label,width/2,y+20);ctx.textAlign='left';y+=43;prev=m.date}
   const isMe=m.side==='me';const bw=Math.min(width-2*pad-35,Math.max(180,Math.max(...item.lines.map(l=>measure.measureText(l).width),0)+26));const bh=item.h;const x=isMe?width-pad-bw:pad;ctx.fillStyle=isMe?colors.me:colors.them;drawRounded(ctx,x,y,bw,bh,12);ctx.fillStyle='#20242c';ctx.font='21px Arial';item.lines.forEach((line,j)=>ctx.fillText(line,x+13,y+29+j*36));ctx.fillStyle='#6e7a75';ctx.font='14px Arial';ctx.textAlign='right';ctx.fillText(m.time,x+bw-10,y+bh-8);ctx.textAlign='left';y+=bh+12;
  }
  y=height-bottomH;ctx.fillStyle=platform==='whatsapp'?'#f7f7f7':'#fff';ctx.fillRect(0,y,width,bottomH);ctx.fillStyle='#f0f2f4';drawRounded(ctx,14,y+8,width-28,38,19);ctx.fillStyle='#8a929e';ctx.font='17px Arial';ctx.fillText('Message',32,y+33);
- if($('fictionLabel').checked){ctx.fillStyle='#f7f1e7';ctx.fillRect(0,height-34,width,34);ctx.fillStyle='#756a5d';ctx.font='bold 13px Arial';ctx.textAlign='center';ctx.fillText('FICTIONAL CHAT • MADE FOR ENTERTAINMENT',width/2,height-12);ctx.textAlign='left'}
+ if($('fictionLabel').checked){ctx.fillStyle='#f7f1e7';ctx.fillRect(0,height-34,width,34);ctx.fillStyle='#756a5d';ctx.font='bold 13px Arial';ctx.textAlign='center';ctx.fillText('FICTIONAL CHAT • FOR EDUCATIONAL & ENTERTAINMENT PURPOSES ONLY',width/2,height-12);ctx.textAlign='left'}
  const a=document.createElement('a');a.download='tempora-fictional-chat.'+(type==='image/jpeg'?'jpg':'png');a.href=canvas.toDataURL(type,.94);a.click();
 }
 $('addMessage').onclick=()=>{messages.push({side:'me',text:'Write your message here',time:'10:30 PM',date:$('chatDate').value||new Date().toISOString().slice(0,10)});renderEditors();renderPreview()};
